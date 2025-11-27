@@ -1,0 +1,219 @@
+#ifndef CONSOLE_UI_H
+#define CONSOLE_UI_H
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <iomanip>
+#include <sstream>
+
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <sys/ioctl.h>
+#include <unistd.h>
+#endif
+
+class ConsoleUI {
+private:
+    static const int DEFAULT_WIDTH = 80;
+
+    // Get console width
+    static int getConsoleWidth() {
+#ifdef _WIN32
+        CONSOLE_SCREEN_BUFFER_INFO csbi;
+        GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+        return csbi.srWindow.Right - csbi.srWindow.Left + 1;
+#else
+        struct winsize w;
+        ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+        return w.ws_col > 0 ? w.ws_col : DEFAULT_WIDTH;
+#endif
+    }
+
+public:
+    // Clear screen
+    static void clear() {
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
+    }
+
+    // Print horizontal line
+    static void printLine(char ch = '=', int width = 0) {
+        if (width == 0) width = getConsoleWidth();
+        std::cout << std::string(width, ch) << std::endl;
+    }
+
+    // Print centered text
+    static void printCentered(const std::string& text, int width = 0) {
+        if (width == 0) width = getConsoleWidth();
+        int padding = (width - text.length()) / 2;
+        if (padding > 0) {
+            std::cout << std::string(padding, ' ') << text << std::endl;
+        }
+        else {
+            std::cout << text << std::endl;
+        }
+    }
+
+    // Print header with title
+    static void printHeader(const std::string& title) {
+        clear();
+        printLine('=');
+        printCentered(title);
+        printLine('=');
+        std::cout << std::endl;
+    }
+
+    // Print menu with options
+    static void printMenu(const std::string& title, const std::vector<std::string>& options) {
+        printHeader(title);
+        for (size_t i = 0; i < options.size(); i++) {
+            std::cout << "  " << (i + 1) << ". " << options[i] << std::endl;
+        }
+        std::cout << "  0. Exit/Back" << std::endl;
+        printLine('-');
+    }
+
+    // Print sub-header
+    static void printSubHeader(const std::string& text) {
+        std::cout << std::endl;
+        printLine('-');
+        std::cout << "  " << text << std::endl;
+        printLine('-');
+    }
+
+    // Print success message
+    static void printSuccess(const std::string& message) {
+        std::cout << "\n[SUCCESS] " << message << std::endl;
+    }
+
+    // Print error message
+    static void printError(const std::string& message) {
+        std::cout << "\n[ERROR] " << message << std::endl;
+    }
+
+    // Print warning message
+    static void printWarning(const std::string& message) {
+        std::cout << "\n[WARNING] " << message << std::endl;
+    }
+
+    // Print info message
+    static void printInfo(const std::string& message) {
+        std::cout << "\n[INFO] " << message << std::endl;
+    }
+
+    // Get user input with prompt
+    static std::string getInput(const std::string& prompt) {
+        std::string input;
+        std::cout << prompt;
+        std::getline(std::cin, input);
+        return input;
+    }
+
+    // Get integer input with validation
+    static int getIntInput(const std::string& prompt) {
+        std::string input;
+        int value;
+        while (true) {
+            std::cout << prompt;
+            std::getline(std::cin, input);
+            std::stringstream ss(input);
+            if (ss >> value && ss.eof()) {
+                return value;
+            }
+            printError("Invalid input. Please enter a valid number.");
+        }
+    }
+
+    // Get double input with validation
+    static double getDoubleInput(const std::string& prompt) {
+        std::string input;
+        double value;
+        while (true) {
+            std::cout << prompt;
+            std::getline(std::cin, input);
+            std::stringstream ss(input);
+            if (ss >> value && ss.eof()) {
+                return value;
+            }
+            printError("Invalid input. Please enter a valid number.");
+        }
+    }
+
+    // Wait for user to press Enter
+    static void pause() {
+        std::cout << "\nPress Enter to continue...";
+        std::cin.get();
+    }
+
+    // Print table header
+    static void printTableHeader(const std::vector<std::string>& headers,
+        const std::vector<int>& widths) {
+        std::cout << std::endl;
+        for (size_t i = 0; i < headers.size(); i++) {
+            std::cout << std::left << std::setw(widths[i]) << headers[i] << " ";
+        }
+        std::cout << std::endl;
+
+        int totalWidth = 0;
+        for (int w : widths) totalWidth += w + 1;
+        printLine('-', totalWidth);
+    }
+
+    // Print table row
+    static void printTableRow(const std::vector<std::string>& columns,
+        const std::vector<int>& widths) {
+        for (size_t i = 0; i < columns.size() && i < widths.size(); i++) {
+            std::string text = columns[i];
+            if (text.length() > (size_t)widths[i]) {
+                text = text.substr(0, widths[i] - 3) + "...";
+            }
+            std::cout << std::left << std::setw(widths[i]) << text << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    // Print a box with content
+    static void printBox(const std::string& content, int width = 60) {
+        printLine('+', width);
+
+        std::istringstream iss(content);
+        std::string line;
+        while (std::getline(iss, line)) {
+            int padding = width - line.length() - 4;
+            std::cout << "| " << line;
+            if (padding > 0) {
+                std::cout << std::string(padding, ' ');
+            }
+            std::cout << " |" << std::endl;
+        }
+
+        printLine('+', width);
+    }
+
+    // Print choice prompt
+    static int getChoice(const std::string& prompt = "Enter your choice: ") {
+        return getIntInput(prompt);
+    }
+
+    // Confirm action
+    static bool confirm(const std::string& message) {
+        std::string input;
+        std::cout << message << " (y/n): ";
+        std::getline(std::cin, input);
+        return (input == "y" || input == "Y" || input == "yes" || input == "Yes");
+    }
+
+    // Print section divider
+    static void printDivider() {
+        std::cout << std::endl;
+        printLine('*', 40);
+        std::cout << std::endl;
+    }
+};
+
+#endif // CONSOLE_UI_H
