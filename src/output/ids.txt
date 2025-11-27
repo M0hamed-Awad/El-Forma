@@ -1,0 +1,4 @@
+User:0
+Admin:1
+Member:4
+Trainer:4
