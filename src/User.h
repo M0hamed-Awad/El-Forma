@@ -27,7 +27,7 @@ public:
     string getName() const { return name; }
     string getEmail() const { return email; }
 
-    // functions
+    // Functions
     bool login(string userInputEmail, string userInputPassword)
     {
         if (userInputEmail == email && userInputPassword == password)

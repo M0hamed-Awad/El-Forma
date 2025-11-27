@@ -2,14 +2,64 @@
 #define MEMBER_H
 
 #include "User.h"
+#include <ctime>
+#include <string>
 
-class Member : public User {
+class Member : public User
+{
+    string joinDate;
+    int subscriptionId;
+
+    string getCurrentDate()
+    {
+        time_t now = time(0);
+        tm *ltm = localtime(&now);
+
+        string year = to_string(1900 + ltm->tm_year);
+        string month = to_string(1 + ltm->tm_mon);
+        string day = to_string(ltm->tm_mday);
+
+        // Add leading '0' for months/days ----->  "5" -> "05"
+        if (month.length() == 1)
+            month = "0" + month;
+        if (day.length() == 1)
+            day = "0" + day;
+
+        return year + "-" + month + "-" + day;
+    }
+
 public:
-    // Simple Constructor
-    Member(int id, string name) : User(id, name) {}
+    // Automatic Join Date Assignment
+    Member(string memberName, string memberEmail, string memberPassword)
+        : User(memberName, memberEmail, memberPassword)
+    {
+        joinDate = getCurrentDate();
+        subscriptionId = 0;
+    }
 
-    void displayInfo() override {
-        cout << "[Member] ID: " << id << " | Name: " << name << endl;
+    // Manual Join Date Assignment (For Backdating)
+    Member(string memberName, string memberEmail, string memberPassword, string specificDate)
+        : User(memberName, memberEmail, memberPassword)
+    {
+        joinDate = specificDate;
+        subscriptionId = 0;
+    }
+
+    // Getters
+    int getSubscriptionId() {return subscriptionId;}
+    string getJoinDate() { return joinDate;}
+
+    // Setters
+    void setSubscriptionId(int id) { subscriptionId = id; }
+
+    // Functions
+    void manageAccount(int userId) override {
+        cout << "Member " << name << " Profile | ID: " << id << endl;
+        cout << "Joined: " << joinDate << endl;
+    }
+    
+    void checkIn(){
+        cout << "Member " << name << " checked in on " << getCurrentDate() << "." << endl;
     }
 };
 
