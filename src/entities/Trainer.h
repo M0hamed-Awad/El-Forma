@@ -9,17 +9,29 @@ class Trainer : public User
 {
     string specialty;
     vector<Member *> assignedMembers;
+    
+    inline static int nextTrainerId = 0;
+    inline static bool loadingFromDB = false;
 
 public:
     Trainer(string trainerName, string trainerEmail, string trainerPassword, string trainerSpecialty)
         : User(trainerName, trainerEmail, trainerPassword)
     {
         specialty = trainerSpecialty;
+        
+        if (!loadingFromDB) {
+            nextTrainerId++;
+            id = nextTrainerId;
+        }
     }
 
     // Getters
-    string getTrainerSpecialty() { return specialty; }
-    vector<Member *> getAssignedMembers() { return assignedMembers; }
+    string getTrainerSpecialty() const { return specialty; }
+    vector<Member *> getAssignedMembers() const { return assignedMembers; }
+    
+    // Static ID management
+    static void setNextTrainerId(int lastId) { nextTrainerId = lastId; }
+    static void setLoadingMode(bool loading) { loadingFromDB = loading; }
 
     // Setters
     void setTrainerSpecialty(string trainerSpecialty) { specialty = trainerSpecialty; }

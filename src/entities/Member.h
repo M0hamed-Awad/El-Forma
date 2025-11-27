@@ -9,6 +9,9 @@ class Member : public User
 {
     string joinDate;
     int subscriptionId;
+    
+    inline static int nextMemberId = 0;
+    inline static bool loadingFromDB = false;
 
     string getCurrentDate()
     {
@@ -19,7 +22,7 @@ class Member : public User
         string month = to_string(1 + ltm->tm_mon);
         string day = to_string(ltm->tm_mday);
 
-        // Add leading '0' for months/days ----->  "5" -> "05"
+        // Add leading '0' for months/days -----> "5" -> "05"
         if (month.length() == 1)
             month = "0" + month;
         if (day.length() == 1)
@@ -35,6 +38,11 @@ public:
     {
         joinDate = getCurrentDate();
         subscriptionId = 0;
+        
+        if (!loadingFromDB) {
+            nextMemberId++;
+            id = nextMemberId;
+        }
     }
 
     // Manual Join Date Assignment (For Backdating)
@@ -43,14 +51,23 @@ public:
     {
         joinDate = specificDate;
         subscriptionId = 0;
+        
+        if (!loadingFromDB) {
+            nextMemberId++;
+            id = nextMemberId;
+        }
     }
 
     // Getters
-    int getSubscriptionId() {return subscriptionId;}
-    string getJoinDate() { return joinDate;}
+    int getSubscriptionId() const {return subscriptionId;}
+    string getJoinDate() const { return joinDate;}
+    
+    // Static ID management
+    static void setNextMemberId(int lastId) { nextMemberId = lastId; }
+    static void setLoadingMode(bool loading) { loadingFromDB = loading; }
 
     // Setters
-    void setSubscriptionId(int id) { subscriptionId = id; }
+    void setSubscriptionId(int subscId) { subscriptionId = subscId; }
 
     // Functions
     void manageAccount(int userId) override {

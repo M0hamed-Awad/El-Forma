@@ -12,20 +12,21 @@ protected:
     string name;
     string email;
     string password;
-    inline static int nextUserId = 0;
 
 public:
     User(string userName, string userEmail, string userPassword)
-        : name(userName), email(userEmail), password(userPassword)
+        : name(userName), email(userEmail), password(userPassword), id(0)
     {
-        nextUserId++;
-        id = nextUserId;
+        // ID will be set by derived class
     }
 
     // Getters
     int getId() const { return id; }
     string getName() const { return name; }
     string getEmail() const { return email; }
+    
+    // Setters
+    void setId(int newId) { id = newId; }
 
     // Functions
     bool login(string userInputEmail, string userInputPassword)
