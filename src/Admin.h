@@ -1,5 +1,5 @@
-#ifndef GYMSYSTEM_H
-#define GYMSYSTEM_H
+#ifndef ADMIN_H
+#define ADMIN_H
 
 #include <iostream>
 #include <vector>
@@ -7,7 +7,7 @@
 #include "Trainer.h"
 using namespace std;
 
-class GymSystem {
+class Admin {
 public:
     // dummy functions
     void addMember() {

@@ -1,11 +1,11 @@
 #ifndef TRAINER_H
 #define TRAINER_H
 
-#include "Person.h"
+#include "User.h"
 
-class Trainer : public Person {
+class Trainer : public User {
 public:
-    Trainer(int id, string name) : Person(id, name) {}
+    Trainer(int id, string name) : User(id, name) {}
 
     void displayInfo() override {
         cout << "[Trainer] ID: " << id << " | Name: " << name << endl;

@@ -1,10 +1,10 @@
 #include <iostream>
-#include "GymSystem.h"
+#include "Admin.h"
 
 using namespace std;
 
 int main() {
-    GymSystem myGym;
+    Admin admin;
     cout << "\n>> Testing GymSystem <<\n" << endl;
     return 0;
 }

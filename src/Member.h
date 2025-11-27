@@ -1,12 +1,12 @@
 #ifndef MEMBER_H
 #define MEMBER_H
 
-#include "Person.h"
+#include "User.h"
 
-class Member : public Person {
+class Member : public User {
 public:
     // Simple Constructor
-    Member(int id, string name) : Person(id, name) {}
+    Member(int id, string name) : User(id, name) {}
 
     void displayInfo() override {
         cout << "[Member] ID: " << id << " | Name: " << name << endl;

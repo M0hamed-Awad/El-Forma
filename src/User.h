@@ -1,17 +1,20 @@
-#ifndef PERSON_H
-#define PERSON_H
+#ifndef USER_H
+#define USER_H
 
 #include <iostream>
 #include <string>
 using namespace std;
 
-class Person {
+class User {
 protected:
     int id;
     string name;
 
 public:
-    Person(int id, string name) : id(id), name(name) {}
+    User(int id, string name) : id(id), name(name) {}
+
+    int getId() const { return id; }
+    string getName() const { return name; }
 
     // function to test the inheritance
     virtual void displayInfo() {
