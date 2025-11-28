@@ -5,123 +5,86 @@
 #include <vector>
 #include <string>
 
-#include "../services/DB.h"
 #include "../entities/Member.h"
 #include "IDManager.h"
 
 using namespace std;
 
-// MemberDB class - handles member-specific database operations
+// MemberDB class - handles member-specific database operations (in-memory)
 class MemberDB {
 private:
-    DB db;
+    // Static vector to store members in memory
+    static vector<Member*> members;
+    static bool initialized;
+    
+    // Initialize with fake members for testing
+    static void initialize() {
+        if (!initialized) {
+            // Create fake members for testing
+            Member* member1 = new Member("John Doe", "john@gmail.com", "password123", "2024-01-15");
+            member1->setId(1);
+            member1->setSubscriptionId(1);
+            members.push_back(member1);
+            
+            Member* member2 = new Member("Sarah Johnson", "sarah@gmail.com", "password456", "2024-02-20");
+            member2->setId(2);
+            member2->setSubscriptionId(2);
+            members.push_back(member2);
+            
+            Member* member3 = new Member("Mike Wilson", "mike@gmail.com", "password789", "2024-03-10");
+            member3->setId(3);
+            member3->setSubscriptionId(0); // No subscription
+            members.push_back(member3);
+            
+            // Update ID counter
+            IDManager::saveLastID("Member", 3);
+            initialized = true;
+        }
+    }
 
 public:
     // Constructor
-    MemberDB(const string& filename = "members.txt") : db(filename) {}
+    MemberDB() {
+        initialize();
+    }
 
-    // Load all members from file
-    // Format: id,name,email,password,joinDate,subscriptionId
+    // Load all members (returns the in-memory vector)
     vector<Member*> loadMembers() const {
-        vector<Member*> members;
-        vector<string> lines = db.readLines();
-        int maxId = 0;
-
-        for (const string& line : lines) {
-            vector<string> fields = DB::split(line, ',');
-            
-            // Ensure we have at least 4 fields: id, name, email, password
-            // Optional: joinDate (5th), subscriptionId (6th)
-            if (fields.size() >= 4) {
-                int id = 0;
-                string name = DB::trim(fields[1]);
-                string email = DB::trim(fields[2]);
-                string password = DB::trim(fields[3]);
-                
-                // Parse ID
-                try {
-                    id = stoi(DB::trim(fields[0]));
-                    if (id > maxId) maxId = id;
-                } catch (...) {
-                    continue; // Skip invalid ID
-                }
-                
-                if (!name.empty() && !email.empty() && !password.empty()) {
-                    Member* member;
-                    
-                    // Check if join date is provided
-                    if (fields.size() >= 5 && !DB::trim(fields[4]).empty()) {
-                        string joinDate = DB::trim(fields[4]);
-                        member = new Member(name, email, password, joinDate);
-                    } else {
-                        member = new Member(name, email, password);
-                    }
-                    
-                    // Restore the ID from file
-                    member->setId(id);
-                    
-                    // Set subscription ID if provided
-                    if (fields.size() >= 6 && !DB::trim(fields[5]).empty()) {
-                        try {
-                            int subId = stoi(DB::trim(fields[5]));
-                            member->setSubscriptionId(subId);
-                        } catch (...) {
-                            // Invalid subscription ID, keep default 0
-                        }
-                    }
-                    
-                    members.push_back(member);
-                }
-            }
-        }
-        
-        // Update the ID counter
-        if (maxId > 0) {
-            IDManager::saveLastID("Member", maxId);
-        }
-
+        initialize();
         return members;
     }
 
-    // Save all members to file
-    bool saveMembers(const vector<Member*>& members) const {
-        vector<string> lines;
-        int maxId = 0;
+    // Save all members (updates the in-memory vector)
+    bool saveMembers(const vector<Member*>& newMembers) const {
+        members = newMembers;
         
+        // Update ID counter based on members
+        int maxId = 0;
         for (const Member* member : members) {
-            // Format: id,name,email,password,joinDate,subscriptionId
-            string line = to_string(member->getId()) + "," +
-                         member->getName() + "," + 
-                         member->getEmail() + "," +
-                         "******" + "," +  // Don't save actual password
-                         member->getJoinDate() + "," +
-                         to_string(member->getSubscriptionId());
-            lines.push_back(line);
-            
             if (member->getId() > maxId) {
                 maxId = member->getId();
             }
         }
-        
-        // Update ID counter
         if (maxId > 0) {
             IDManager::saveLastID("Member", maxId);
         }
-
-        return db.writeLines(lines);
+        
+        return true;
     }
 
     // Add a new member
-    bool addMember(const Member* member) const {
-        string line = member->getName() + "," + 
-                     member->getEmail() + "," +
-                     "******" + "," +  // Password placeholder
-                     member->getJoinDate() + "," +
-                     to_string(member->getSubscriptionId());
-        return db.appendLine(line);
+    bool addMember(Member* member) const {
+        members.push_back(member);
+        
+        // Update ID counter
+        if (member->getId() > IDManager::getLastID("Member")) {
+            IDManager::saveLastID("Member", member->getId());
+        }
+        
+        return true;
     }
 
-    // Update a member (replace entire file)
+    // Update a member (replace entire vector)
     bool updateMember(const vector<Member*>& allMembers) const {
         return saveMembers(allMembers);
     }
@@ -141,59 +104,39 @@ public:
 
     // Find member by ID
     Member* findMemberById(int id) const {
-        vector<Member*> members = loadMembers();
-        
         for (Member* member : members) {
             if (member->getId() == id) {
-                // Clean up other members
-                for (Member* m : members) {
-                    if (m != member) {
-                        delete m;
-                    }
-                }
                 return member;
             }
         }
         
-        // Clean up all members if not found
-        for (Member* m : members) {
-            delete m;
-        }
         return nullptr;
     }
 
     // Find member by email
     Member* findMemberByEmail(const string& email) const {
-        vector<Member*> members = loadMembers();
-        
         for (Member* member : members) {
             if (member->getEmail() == email) {
-                // Clean up other members
-                for (Member* m : members) {
-                    if (m != member) {
-                        delete m;
-                    }
-                }
                 return member;
             }
         }
         
-        // Clean up all members if not found
-        for (Member* m : members) {
-            delete m;
-        }
         return nullptr;
     }
 
-    // Check if file exists
+    // Check if data exists (always true for in-memory)
     bool fileExists() const {
-        return db.fileExists();
+        return true;
     }
 
-    // Get filename
+    // Get filename (no longer relevant but kept for compatibility)
     string getFilename() const {
-        return db.getFilename();
+        return "in-memory";
     }
 };
+
+// Initialize static members
+vector<Member*> MemberDB::members;
+bool MemberDB::initialized = false;
 
 #endif // MEMBER_DB_H

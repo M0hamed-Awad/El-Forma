@@ -5,123 +5,92 @@
 #include <vector>
 #include <string>
 
-#include "../services/DB.h"
 #include "../entities/Admin.h"
 
 using namespace std;
 
-// AdminDB class - handles admin-specific database operations
+// AdminDB class - handles admin-specific database operations (in-memory)
 class AdminDB {
 private:
-    DB db;
+    // Static vector to store admins in memory
+    static vector<Admin*> admins;
+    static bool initialized;
+    
+    // Initialize with default admin
+    static void initialize() {
+        if (!initialized) {
+            // Create default admin: admin@gmail.com / admin
+            Admin* defaultAdmin = new Admin("Admin", "admin@gmail.com", "admin");
+            admins.push_back(defaultAdmin);
+            initialized = true;
+        }
+    }
 
 public:
     // Constructor
-    AdminDB(const string& filename = "admins.txt") : db(filename) {}
+    AdminDB() {
+        initialize();
+    }
 
-    // Load all admins from file
-    // Format: name,email,password
+    // Load all admins (returns the in-memory vector)
     vector<Admin*> loadAdmins() const {
-        vector<Admin*> admins;
-        vector<string> lines = db.readLines();
-
-        for (const string& line : lines) {
-            vector<string> fields = DB::split(line, ',');
-            
-            // Ensure we have exactly 3 fields: name, email, password
-            if (fields.size() >= 3) {
-                string name = DB::trim(fields[0]);
-                string email = DB::trim(fields[1]);
-                string password = DB::trim(fields[2]);
-                
-                if (!name.empty() && !email.empty() && !password.empty()) {
-                    Admin* admin = new Admin(name, email, password);
-                    admins.push_back(admin);
-                }
-            }
-        }
-
+        initialize();
         return admins;
     }
 
-    // Save all admins to file
-    bool saveAdmins(const vector<Admin*>& admins) const {
-        vector<string> lines;
-        
-        for (const Admin* admin : admins) {
-            // Format: name,email,password
-            string line = admin->getName() + "," + 
-                         admin->getEmail() + "," +
-                         "******";  // Don't save actual password for security
-            lines.push_back(line);
-        }
-
-        return db.writeLines(lines);
+    // Save all admins (updates the in-memory vector)
+    bool saveAdmins(const vector<Admin*>& newAdmins) const {
+        // Clear old admins (don't delete, assume caller manages memory)
+        admins = newAdmins;
+        return true;
     }
 
     // Find admin by email
     Admin* findAdminByEmail(const string& email) const {
-        vector<Admin*> admins = loadAdmins();
+        initialize();
         
         for (Admin* admin : admins) {
             if (admin->getEmail() == email) {
-                // Clean up other admins
-                for (Admin* a : admins) {
-                    if (a != admin) {
-                        delete a;
-                    }
-                }
                 return admin;
             }
         }
         
-        // Clean up all admins if not found
-        for (Admin* a : admins) {
-            delete a;
-        }
         return nullptr;
     }
 
     // Add a new admin
-    bool addAdmin(const Admin* admin) const {
-        string line = admin->getName() + "," + 
-                     admin->getEmail() + "," +
-                     "******";  // Password placeholder
-        return db.appendLine(line);
+    bool addAdmin(Admin* admin) const {
+        initialize();
+        admins.push_back(admin);
+        return true;
     }
 
     // Authenticate admin
     Admin* authenticate(const string& email, const string& password) const {
-        vector<Admin*> admins = loadAdmins();
+        initialize();
         
         for (Admin* admin : admins) {
             if (admin->login(email, password)) {
-                // Clean up other admins
-                for (Admin* a : admins) {
-                    if (a != admin) {
-                        delete a;
-                    }
-                }
                 return admin;
             }
         }
         
-        // Clean up all admins if authentication failed
-        for (Admin* a : admins) {
-            delete a;
-        }
         return nullptr;
     }
 
-    // Check if file exists
+    // Check if data exists (always true for in-memory)
     bool fileExists() const {
-        return db.fileExists();
+        return true;
     }
 
-    // Get filename
+    // Get filename (no longer relevant but kept for compatibility)
     string getFilename() const {
-        return db.getFilename();
+        return "in-memory";
     }
 };
+
+// Initialize static members
+vector<Admin*> AdminDB::admins;
+bool AdminDB::initialized = false;
 
 #endif // ADMIN_DB_H
