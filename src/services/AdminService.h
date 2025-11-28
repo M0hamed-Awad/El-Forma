@@ -20,7 +20,7 @@ private:
     void initialize() {
         if (!initialized) {
             // Create default admin
-            admins.push_back(new Admin("Mohamed Rashad", "mohamed@gmail.com", "admin"));
+            admins.push_back(new Admin("Mohamed Rashad", "admin", "123"));
             initialized = true;
         }
     }
