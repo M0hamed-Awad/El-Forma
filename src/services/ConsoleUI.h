@@ -293,36 +293,21 @@ public:
     }
 
     // Print table header
-    static void printTableHeader(const std::vector<std::string> &headers,
-                                 const std::vector<int> &widths)
+    static void printTableHeader(const vector<string> &headers, const vector<int> &widths)
     {
-        std::cout << std::endl;
+        cout << endl;
         for (size_t i = 0; i < headers.size(); i++)
-        {
-            std::cout << std::left << std::setw(widths[i]) << headers[i] << " ";
-        }
-        std::cout << std::endl;
-
-        int totalWidth = 0;
-        for (int w : widths)
-            totalWidth += w + 1;
-        printLine('-', totalWidth);
+            cout << left << setw(widths[i]) << headers[i] << " ";
+        cout << endl
+             << string(60, '-') << endl;
     }
 
     // Print table row
-    static void printTableRow(const std::vector<std::string> &columns,
-                              const std::vector<int> &widths)
+    static void printTableRow(const vector<string> &columns, const vector<int> &widths)
     {
-        for (size_t i = 0; i < columns.size() && i < widths.size(); i++)
-        {
-            std::string text = columns[i];
-            if (text.length() > (size_t)widths[i])
-            {
-                text = text.substr(0, widths[i] - 3) + "...";
-            }
-            std::cout << std::left << std::setw(widths[i]) << text << " ";
-        }
-        std::cout << std::endl;
+        for (size_t i = 0; i < columns.size(); i++)
+            cout << left << setw(widths[i]) << columns[i] << " ";
+        cout << endl;
     }
 
     // Print a box with content
