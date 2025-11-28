@@ -13,25 +13,28 @@
 #include "../services/MemberService.h"
 #include "../services/TrainerService.h"
 
-
 using namespace std;
 
-class System {
+class System
+{
 private:
-    Admin* currentAdmin;  // Nullable admin pointer
-    AdminService adminService;      // Service for admins
-    MemberService memberService;    // Service for members
-    TrainerService trainerService;  // Service for trainers
+    Admin *currentAdmin;           // Nullable admin pointer
+    AdminService adminService;     // Service for admins
+    MemberService memberService;   // Service for members
+    TrainerService trainerService; // Service for trainers
 
 public:
     // Constructor
-    System() : currentAdmin(nullptr) {
+    System() : currentAdmin(nullptr)
+    {
         // Database classes initialize themselves with test data
     }
 
     // Destructor
-    ~System() {
-        if (currentAdmin != nullptr) {
+    ~System()
+    {
+        if (currentAdmin != nullptr)
+        {
             delete currentAdmin;
             currentAdmin = nullptr;
         }
@@ -39,102 +42,112 @@ public:
     }
 
     // ==================== AUTHENTICATION ====================
-    
+
     // Show authentication menu
-    void showAuthMenu() {
+    void showAuthMenu()
+    {
         vector<string> options = {
             "Login",
-            "About"
-        };
-        
+            "About"};
+
         ConsoleUI::printMenu("El-Forma Gym Management - Authentication", options);
     }
 
     // Login function
-    bool login() {
+    bool login()
+    {
         currentAdmin = adminService.login();
         return currentAdmin != nullptr;
     }
 
     // Logout function
-    void logout() {
+    void logout()
+    {
         adminService.logout(currentAdmin);
-        if (currentAdmin != nullptr) {
+        if (currentAdmin != nullptr)
+        {
             delete currentAdmin;
             currentAdmin = nullptr;
         }
     }
 
     // Check if admin is logged in
-    bool isLoggedIn() const {
+    bool isLoggedIn() const
+    {
         return currentAdmin != nullptr;
     }
 
     // Get current admin
-    Admin* getCurrentAdmin() const {
+    Admin *getCurrentAdmin() const
+    {
         return currentAdmin;
     }
 
-
-
     // ==================== MEMBER CRUD ====================
-    
+
     // Create - Add new member
-    void addMember() {
+    void addMember()
+    {
         memberService.addMember();
     }
-    
+
     // Read - View all members
-    void viewAllMembers() {
+    void viewAllMembers()
+    {
         memberService.viewAllMembers();
     }
-    
+
     // Update - Update member information
-    void updateMember() {
+    void updateMember()
+    {
         memberService.updateMember();
     }
-    
+
     // Delete - Remove a member
-    void deleteMember() {
+    void deleteMember()
+    {
         memberService.deleteMember();
     }
-    
 
-    
     // ==================== TRAINER CRUD ====================
-    
+
     // Create - Add new trainer
-    void addTrainer() {
+    void addTrainer()
+    {
         trainerService.addTrainer();
     }
-    
+
     // Read - View all trainers
-    void viewAllTrainers() {
+    void viewAllTrainers()
+    {
         trainerService.viewAllTrainers();
     }
 
     // View assigned members
-    void viewAssignedMembers() {
+    void viewAssignedMembers()
+    {
         trainerService.viewAssignedMembers();
     }
 
     // Update - Update trainer information
-    void updateTrainer() {
+    void updateTrainer()
+    {
         trainerService.updateTrainer(memberService.getAllMembers());
     }
-    
+
     // Delete - Remove a trainer
-    void deleteTrainer() {
+    void deleteTrainer()
+    {
         trainerService.deleteTrainer();
     }
-    
 
-    
     // ==================== MENU SYSTEM ====================
 
     // Show main menu (after login)
-    void showMainMenu() {
-        if (!isLoggedIn()) {
+    void showMainMenu()
+    {
+        if (!isLoggedIn())
+        {
             ConsoleUI::printError("Please login first!");
             return;
         }
@@ -142,156 +155,165 @@ public:
         vector<string> options = {
             "Manage Members",
             "Manage Trainers",
-            "Logout"
-        };
-        
+            "Logout"};
+
         ConsoleUI::printMenu("El-Forma Gym Management - Main Menu", options);
     }
-    
+
     // Show members management menu
-    void showMembersMenu() {
+    void showMembersMenu()
+    {
         vector<string> options = {
             "Add Member",
             "View All Members",
             "Update Member",
-            "Delete Member"
-        };
-        
+            "Delete Member"};
+
         ConsoleUI::printMenu("Members Management", options);
     }
-    
+
     // Show trainers management menu
-    void showTrainersMenu() {
+    void showTrainersMenu()
+    {
         vector<string> options = {
             "Add Trainer",
             "View All Trainers",
             "View Assigned Members",
             "Update Trainer",
-            "Delete Trainer"
-        };
-        
+            "Delete Trainer"};
+
         ConsoleUI::printMenu("Trainers Management", options);
     }
-    
+
     // Handle members menu
-    void handleMembersMenu() {
-        while (true) {
+    void handleMembersMenu()
+    {
+        while (true)
+        {
             showMembersMenu();
             int choice = ConsoleUI::getChoice();
-            
-            switch (choice) {
-                case 0: // Back
-                    return;
-                case 1: // Add
-                    addMember();
-                    ConsoleUI::pause();
-                    break;
-                case 2: // View All
-                    viewAllMembers();
-                    ConsoleUI::pause();
-                    break;
-                case 3: // Update
-                    updateMember();
-                    ConsoleUI::pause();
-                    break;
-                case 4: // Delete
-                    deleteMember();
-                    ConsoleUI::pause();
-                    break;
-                default:
-                    ConsoleUI::printError("Invalid choice!");
-                    ConsoleUI::pause();
-                    break;
+
+            switch (choice)
+            {
+            case 0: // Back
+                return;
+            case 1: // Add
+                addMember();
+                ConsoleUI::pause();
+                break;
+            case 2: // View All
+                viewAllMembers();
+                ConsoleUI::pause();
+                break;
+            case 3: // Update
+                updateMember();
+                ConsoleUI::pause();
+                break;
+            case 4: // Delete
+                deleteMember();
+                ConsoleUI::pause();
+                break;
+            default:
+                ConsoleUI::printError("Invalid choice!");
+                ConsoleUI::pause();
+                break;
             }
         }
     }
-    
+
     // Handle trainers menu
-    void handleTrainersMenu() {
-        while (true) {
+    void handleTrainersMenu()
+    {
+        while (true)
+        {
             showTrainersMenu();
             int choice = ConsoleUI::getChoice();
-            
-            switch (choice) {
-                case 0: // Back
-                    return;
-                case 1: // Add
-                    addTrainer();
-                    ConsoleUI::pause();
-                    break;
-                case 2: // View All
-                    viewAllTrainers();
-                    ConsoleUI::pause();
-                    break;
-                case 3: // View Assigned Members
-                    viewAssignedMembers();
-                    ConsoleUI::pause();
-                    break;
-                case 4: // Update
-                    updateTrainer();
-                    ConsoleUI::pause();
-                    break;
-                case 5: // Delete
-                    deleteTrainer();
-                    ConsoleUI::pause();
-                    break;
-                default:
-                    ConsoleUI::printError("Invalid choice!");
-                    ConsoleUI::pause();
-                    break;
+
+            switch (choice)
+            {
+            case 0: // Back
+                return;
+            case 1: // Add
+                addTrainer();
+                ConsoleUI::pause();
+                break;
+            case 2: // View All
+                viewAllTrainers();
+                ConsoleUI::pause();
+                break;
+            case 3: // View Assigned Members
+                viewAssignedMembers();
+                ConsoleUI::pause();
+                break;
+            case 4: // Update
+                updateTrainer();
+                ConsoleUI::pause();
+                break;
+            case 5: // Delete
+                deleteTrainer();
+                ConsoleUI::pause();
+                break;
+            default:
+                ConsoleUI::printError("Invalid choice!");
+                ConsoleUI::pause();
+                break;
             }
         }
     }
 
     // Run the application
-    void run() {
-        while (true) {
-            if (!isLoggedIn()) {
-                // Show authentication menu
-                showAuthMenu();
-                int choice = ConsoleUI::getChoice();
+    void run()
+    {
+        while (true)
+        {
+            // Check if we need to show the "Welcome/Login" screen
+            if (!isLoggedIn())
+            {
+                // Define the options
+                vector<string> authOptions = {
+                    "Login to System",
+                    "About El-Forma",
+                    "Exit"
+                };
 
-                switch (choice) {
-                    case 0: // Exit
-                        ConsoleUI::printInfo("Goodbye!");
-                        return;
-                    case 1: // Login
-                        login();
-                        break;
-                    case 2: // About
-                        ConsoleUI::printHeader("About El-Forma");
-                        ConsoleUI::printInfo("El-Forma Gym Management System v1.0");
-                        ConsoleUI::printInfo("Developed for ITI SWE Course");
-                        ConsoleUI::pause();
-                        break;
-                    default:
-                        ConsoleUI::printError("Invalid choice!");
-                        ConsoleUI::pause();
-                        break;
+                // Show the Menu
+                int choice = 0; 
+
+                // Handle selection (Index 0, 1, 2)
+                if (choice == 0) {
+                    if (!login()) continue; // If login fails, restart loop
+                } 
+                else if (choice == 1) {
+                    ConsoleUI::printInfo("El-Forma System v2.0 - ITI Project");
+                    ConsoleUI::pause();
+                }
+                else {
+                    return; // Exit the program
                 }
             }
-            else {
-                // Show main menu (logged in)
-                showMainMenu();
-                int choice = ConsoleUI::getChoice();
+            // We are logged in! Show the Dashboard.
+            else
+            {
+                vector<string> mainOptions = {
+                    "Manage Members",
+                    "Manage Trainers",
+                    "Logout"};
 
-                switch (choice) {
-                    case 0: // Back/Logout
-                        logout();
-                        break;
-                    case 1: // Manage Members
-                        handleMembersMenu();
-                        break;
-                    case 2: // Manage Trainers
-                        handleTrainersMenu();
-                        break;
-                    case 3: // Logout
-                        logout();
-                        break;
-                    default:
-                        ConsoleUI::printError("Invalid choice!");
-                        ConsoleUI::pause();
-                        break;
+                // get menu choice here
+                int choice = 1; 
+
+                // Handle selection (Index 0, 1, 2)
+                switch (choice)
+                {
+                case 0:
+                    handleMembersMenu();
+                    break;
+                case 1:
+                    handleTrainersMenu();
+                    break;
+                case 2:
+                    logout();
+                    break;
                 }
             }
         }
