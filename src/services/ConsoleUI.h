@@ -40,6 +40,13 @@ private:
     static const int BACKSPACE_KEY = 8;
     static const int ESC_KEY = 27;
 
+    // Clears any leftover keystrokes (prevents double-clicking menus)
+    static void flushInput() {
+        while (_kbhit()) {
+            _getch();
+        }
+    }
+
 public:
     // Clear screen
     static void clear()
@@ -219,6 +226,7 @@ public:
     // Returns index (0, 1, 2...)
     static int getMenuSelection(string title, vector<string> options)
     {
+        flushInput(); // Clears the previous Enter key
         int currentSelection = 0;
 
         while (true)
@@ -399,6 +407,7 @@ public:
     // ------------ DRAWING THE FORM ------------
     static vector<string> getFormData(string title, vector<string> fieldLabels)
     {
+        flushInput(); // Clears the previous Enter key
         drawFormTitle(title);
 
         vector<int> fieldRows;
