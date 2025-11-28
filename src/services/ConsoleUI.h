@@ -86,6 +86,34 @@ public:
         }
     }
 
+    // --- OUTPUT HELPERS ---
+    // Print header with title
+    static void printHeader(string title) {
+        clear();
+        cout << "=== " << title << " ===" << endl;
+    }
+    
+    // Print success message
+    static void printSuccess(string msg) { 
+        cout << "\n\033[32m[SUCCESS] " << msg << "\033[0m" << endl; 
+    }
+    
+    // Print error message
+    static void printError(string msg) { 
+        cout << "\n\033[31m[ERROR] " << msg << "\033[0m" << endl; 
+    }
+    
+    // Print warning message
+    static void printWarning(string msg) { 
+        cout << "\n\033[33m[WARNING] " << msg << "\033[0m" << endl; 
+    }
+    
+    // Print info message
+    static void printInfo(string msg) { 
+        cout << "\n[INFO] " << msg << endl; 
+    }
+
+
     // Print horizontal line
     static void printLine(char ch = '=', int width = 0)
     {
@@ -110,16 +138,6 @@ public:
         }
     }
 
-    // Print header with title
-    static void printHeader(const std::string &title)
-    {
-        clear();
-        printLine('=');
-        printCentered(title);
-        printLine('=');
-        std::cout << std::endl;
-    }
-
     // Print menu with options
     static void printMenu(const std::string &title, const std::vector<std::string> &options)
     {
@@ -140,31 +158,6 @@ public:
         std::cout << "  " << text << std::endl;
         printLine('-');
     }
-
-    // Print success message
-    static void printSuccess(const std::string &message)
-    {
-        std::cout << "\n[SUCCESS] " << message << std::endl;
-    }
-
-    // Print error message
-    static void printError(const std::string &message)
-    {
-        std::cout << "\n[ERROR] " << message << std::endl;
-    }
-
-    // Print warning message
-    static void printWarning(const std::string &message)
-    {
-        std::cout << "\n[WARNING] " << message << std::endl;
-    }
-
-    // Print info message
-    static void printInfo(const std::string &message)
-    {
-        std::cout << "\n[INFO] " << message << std::endl;
-    }
-
 
     // Get double input with validation
     static double getDoubleInput(const std::string &prompt)
