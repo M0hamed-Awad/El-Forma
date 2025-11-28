@@ -13,7 +13,6 @@ using namespace std;
 // AdminService class - handles admin operations with UI
 class AdminService {
 private:
-    // Vector to store admins in memory (shared across all instances)
     static vector<Admin*> admins;
     static bool initialized;
     
@@ -21,7 +20,7 @@ private:
     void initialize() {
         if (!initialized) {
             // Create default admin
-            admins.push_back(new Admin("Mohamed Rashad", "mohamed@gmail.com", "admin"));
+            admins.push_back(new Admin("Mohamed Rashad", "admin", "123"));
             initialized = true;
         }
     }
@@ -34,12 +33,16 @@ public:
 
     // Login with UI
     Admin* login() {
-        ConsoleUI::printHeader("Admin Login");
+        // Draw the New Form UI
+        vector<string> data = ConsoleUI::getFormData("ADMIN LOGIN", {"Email", "Password"});
         
-        string email = ConsoleUI::getInput("Enter email: ");
-        string password = ConsoleUI::getInput("Enter password: ");
+        // Check if ESC was pressed (Empty return)
+        if (data.empty()) return nullptr;
 
-        // Authenticate
+        string email = data[0];
+        string password = data[1];
+
+        // Authentication
         Admin* admin = authenticate(email, password);
         
         if (admin != nullptr) {
