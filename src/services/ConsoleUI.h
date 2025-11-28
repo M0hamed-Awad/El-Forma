@@ -50,69 +50,83 @@ public:
     }
 
     // Wait for user to press any key
-    static void pause() {
+    static void pause()
+    {
         cout << "\nPress any key to continue...";
         _getch();
     }
 
     // Cursor Mover
-    static void moveCursor(int row, int col) {
+    static void moveCursor(int row, int col)
+    {
         cout << "\033[" << row << ";" << col << "H";
     }
 
     // --- SIMPLE INPUT HELPERS ---
     // Get user input with prompt
-    static string getInput(string prompt) {
+    static string getInput(string prompt)
+    {
         string input;
-        cout << "\n" << prompt; // Show the question
-        getline(cin, input);    // Get the WHOLE line
-        return input;           // Send it back
+        cout << "\n"
+             << prompt;      // Show the question
+        getline(cin, input); // Get the WHOLE line
+        return input;        // Send it back
     }
 
     // Get integer input with validation
-    static int getIntInput(string prompt) {
+    static int getIntInput(string prompt)
+    {
         int input;
-        while (true) {
-            cout << "\n" << prompt; // Show the question
+        while (true)
+        {
+            cout << "\n"
+                 << prompt; // Show the question
             // Try to read a number
-            if (cin >> input) {     
-                cin.ignore(10000, '\n');    // Clear the input buffer
+            if (cin >> input)
+            {
+                cin.ignore(10000, '\n'); // Clear the input buffer
                 return input;
-            } else {
+            }
+            else
+            {
                 cout << "\033[31m[ERROR] Invalid number.\033[0m";
                 cin.clear();
-                cin.ignore(10000, '\n');    // Throw away the bad text
+                cin.ignore(10000, '\n'); // Throw away the bad text
             }
         }
     }
 
     // --- OUTPUT HELPERS ---
     // Print header with title
-    static void printHeader(string title) {
+    static void printHeader(string title)
+    {
         clear();
         cout << "=== " << title << " ===" << endl;
     }
-    
+
     // Print success message
-    static void printSuccess(string msg) { 
-        cout << "\n\033[32m[SUCCESS] " << msg << "\033[0m" << endl; 
-    }
-    
-    // Print error message
-    static void printError(string msg) { 
-        cout << "\n\033[31m[ERROR] " << msg << "\033[0m" << endl; 
-    }
-    
-    // Print warning message
-    static void printWarning(string msg) { 
-        cout << "\n\033[33m[WARNING] " << msg << "\033[0m" << endl; 
-    }
-    
-    // Print info message
-    static void printInfo(string msg) { 
-        cout << "\n[INFO] " << msg << endl; 
+    static void printSuccess(string msg)
+    {
+        cout << "\n\033[32m[SUCCESS] " << msg << "\033[0m" << endl;
     }
 
+    // Print error message
+    static void printError(string msg)
+    {
+        cout << "\n\033[31m[ERROR] " << msg << "\033[0m" << endl;
+    }
+
+    // Print warning message
+    static void printWarning(string msg)
+    {
+        cout << "\n\033[33m[WARNING] " << msg << "\033[0m" << endl;
+    }
+
+    // Print info message
+    static void printInfo(string msg)
+    {
+        cout << "\n[INFO] " << msg << endl;
+    }
 
     // Print horizontal line
     static void printLine(char ch = '=', int width = 0)
@@ -135,6 +149,105 @@ public:
         else
         {
             std::cout << text << std::endl;
+        }
+    }
+
+    // Draw Menu Title
+    static void drawMenuTitle(const string &title)
+    {
+        cout << "\n=== " << title << " ===\n";
+        cout << "----------------------------------------\n";
+    }
+
+    // Draw Menu Options
+    static void drawMenuOptions(const vector<string> &options, int currentSelection)
+    {
+        // Color every Option in the Menu
+        for (int i = 0; i < options.size(); i++)
+        {
+            // Selected Option
+            if (i == currentSelection)
+            {
+                // Highlight (CYAN)
+                cout << "\033[96m -> " << options[i] << " \033[0m\n";
+            }
+            // Not Selected Option
+            else
+            {
+                cout << "    " << options[i] << "\n";
+            }
+        }
+        cout << "----------------------------------------\n";
+    }
+
+    // Draw the Menu Body
+    static void drawMenu(const string &title, const vector<string> &options, int currentSelection)
+    {
+        clear();
+        drawMenuTitle(title);
+        drawMenuOptions(options, currentSelection);
+    }
+
+    // Handle Arrow UP
+    static void moveUp(int &currentSelection, const vector<string> &options)
+    {
+        currentSelection--; // Updating the Index Value
+        if (currentSelection < 0) // For Circular Functionality
+            currentSelection = options.size() - 1;
+    }
+
+    // Handle Arrow DOWN
+    static void moveDown(int &currentSelection, const vector<string> &options)
+    {
+        currentSelection++; // Updating the Index Value
+        if (currentSelection >= options.size()) // For Circular Functionality
+            currentSelection = 0;
+    }
+
+    // Handle Arrow Keys
+    static void handleArrowKey(int &currentSelection, const vector<string> &options)
+    {
+        char key = _getch();
+
+        // Detect the UP arrow
+        if (key == KEY_UP)
+            moveUp(currentSelection, options);
+        // Detect the DOWN arrow
+        else if (key == KEY_DOWN)
+            moveDown(currentSelection, options);
+    }
+
+    static bool handleMenuNavigation(int &currentSelection, const vector<string> &options)
+    {
+        char key = _getch();
+
+        if (key == -32 || key == 224) // Arrow keys
+        {
+            handleArrowKey(currentSelection, options);
+            return false;
+        }
+        // Detect ENTER Key
+        else if (key == ENTER_KEY)
+        {
+            return true; // User confirmed selection
+        }
+
+        return false;
+    }
+
+    // --- DRAWING THE MENU ---
+    // Returns index (0, 1, 2...)
+    static int getMenuSelection(string title, vector<string> options)
+    {
+        int currentSelection = 0;
+
+        while (true)
+        {
+            drawMenu(title, options, currentSelection);
+
+            bool isEnterPressed = handleMenuNavigation(currentSelection, options);
+            if (isEnterPressed)
+                return currentSelection;
         }
     }
 
