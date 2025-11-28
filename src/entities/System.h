@@ -151,26 +151,12 @@ public:
             if (choice == -1)
                 return; // ESC pressed -> Go back
 
-            switch (choice)
-            {
-            case 0:
-                memberService.addMember();
-                ConsoleUI::pause();
-                break;
-            case 1:
-                memberService.viewAllMembers();
-                ConsoleUI::pause();
-                break;
-            case 2:
-                memberService.updateMember();
-                ConsoleUI::pause();
-                break;
-            case 3:
-                memberService.deleteMember();
-                ConsoleUI::pause();
-                break;
-            case 4:
-                return; // Breaks this loop, goes back to run()
+            switch (choice) {
+                case 0: memberService.addMember(); break;
+                case 1: memberService.viewAllMembers(); break;
+                case 2: memberService.updateMember(); break;
+                case 3: memberService.deleteMember(); break;
+                case 4: return;
             }
         }
     }
@@ -190,32 +176,16 @@ public:
                 "Back to Dashboard"};
 
             int choice = ConsoleUI::getMenuSelection("TRAINERS MANAGEMENT", opts);
+            if (choice == -1)
+                return; // ESC pressed -> Go back
 
-            switch (choice)
-            {
-            case 0:
-                trainerService.addTrainer();
-                ConsoleUI::pause();
-                break;
-            case 1:
-                trainerService.viewAllTrainers();
-                ConsoleUI::pause();
-                break;
-            case 2:
-                trainerService.viewAssignedMembers();
-                ConsoleUI::pause();
-                break;
-            // Note: We need to pass the member list to the trainer service for updates
-            case 3:
-                trainerService.updateTrainer(memberService.getAllMembers());
-                ConsoleUI::pause();
-                break;
-            case 4:
-                trainerService.deleteTrainer();
-                ConsoleUI::pause();
-                break;
-            case 5:
-                return;
+            switch (choice) {
+                case 0: trainerService.addTrainer(); break;
+                case 1: trainerService.viewAllTrainers(); break;
+                case 2: trainerService.viewAssignedMembers(); break;
+                case 3: trainerService.updateTrainer(memberService.getAllMembers()); break;
+                case 4: trainerService.deleteTrainer(); break;
+                case 5: return;
             }
         }
     }

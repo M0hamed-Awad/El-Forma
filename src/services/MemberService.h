@@ -49,7 +49,7 @@ public:
         vector<string> data = ConsoleUI::getFormData("REGISTER NEW MEMBER",
             {"Name", "Email", "Password", "Type (Standard/Premium)"});
 
-        if (data.empty()) return; // Cancelled
+        if (data.empty()) return; // ESC Pressed: Cancelled
         
         Member* newMember = new Member(data[0], data[1], data[2], data[3]);
         members.push_back(newMember);
@@ -57,6 +57,7 @@ public:
         ConsoleUI::printSuccess("Member added successfully!");
         ConsoleUI::printInfo("Member ID: " + to_string(newMember->getId()));
         ConsoleUI::printInfo("Join Date: " + newMember->getJoinDate());
+        ConsoleUI::pause();
     }
     
     // View all members with UI
@@ -83,6 +84,7 @@ public:
             };
             ConsoleUI::printTableRow(row, widths);
         }
+        ConsoleUI::pause();
     }
     
     // Update member with UI
@@ -113,6 +115,8 @@ public:
         } else {
             ConsoleUI::printInfo("Update cancelled");
         }
+
+        ConsoleUI::pause();
     }
     
     // Delete member with UI
@@ -137,6 +141,7 @@ public:
         }
         
         ConsoleUI::printError("Member not found!");
+        ConsoleUI::pause();
     }
     
     // Find member by ID (internal use)

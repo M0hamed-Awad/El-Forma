@@ -49,6 +49,7 @@ public:
         
         ConsoleUI::printSuccess("Trainer added successfully!");
         ConsoleUI::printInfo("Trainer ID: " + to_string(newTrainer->getId()));
+        ConsoleUI::pause();
     }
     
     // View all trainers with UI
@@ -75,6 +76,7 @@ public:
             };
             ConsoleUI::printTableRow(row, widths);
         }
+        ConsoleUI::pause();
     }
     
     // View assigned members for a trainer with UI
@@ -108,6 +110,7 @@ public:
             };
             ConsoleUI::printTableRow(row, widths);
         }
+        ConsoleUI::pause();
     }
     
     // Update trainer with UI
