@@ -428,8 +428,6 @@ public:
         vector<string> options = {
             "Manage Members",
             "Manage Trainers",
-            "Generate Report",
-            "Manage Account",
             "Logout"
         };
         
@@ -568,15 +566,7 @@ public:
                     case 2: // Manage Trainers
                         handleTrainersMenu();
                         break;
-                    case 3: // Generate Report
-                        currentAdmin->generateReport();
-                        ConsoleUI::pause();
-                        break;
-                    case 4: // Manage Account
-                        currentAdmin->manageAccount(currentAdmin->getId());
-                        ConsoleUI::pause();
-                        break;
-                    case 5: // Logout
+                    case 3: // Logout
                         logout();
                         break;
                     default:
