@@ -38,14 +38,13 @@ public:
 
     // Add new trainer with UI
     void addTrainer() {
-        ConsoleUI::printHeader("Add New Trainer");
-        
-        string name = ConsoleUI::getInput("Enter trainer name: ");
-        string email = ConsoleUI::getInput("Enter trainer email: ");
-        string password = ConsoleUI::getInput("Enter trainer password: ");
-        string specialty = ConsoleUI::getInput("Enter trainer specialty: ");
-        
-        Trainer* newTrainer = new Trainer(name, email, password, specialty);
+        // Use the New Form UI
+        vector<string> data = ConsoleUI::getFormData("ADD NEW TRAINER", 
+            {"Name", "Email", "Password", "Specialty"});
+
+        if (data.empty()) return; // Cancelled
+                
+        Trainer* newTrainer = new Trainer(data[0], data[1], data[2], data[3]);
         trainers.push_back(newTrainer);
         
         ConsoleUI::printSuccess("Trainer added successfully!");
