@@ -214,39 +214,27 @@ public:
     // Handle trainers menu
     void handleTrainersMenu()
     {
-        while (true)
-        {
-            showTrainersMenu();
-            int choice = ConsoleUI::getChoice();
+        while (true) {
+             // list of actions for Members
+            vector<string> opts = {
+                "Add New Trainer",
+                "View All Trainers",
+                "View Assigned Members",
+                "Update Trainer",
+                "Delete Trainer",
+                "Back to Dashboard"
+            };
 
-            switch (choice)
-            {
-            case 0: // Back
-                return;
-            case 1: // Add
-                addTrainer();
-                ConsoleUI::pause();
-                break;
-            case 2: // View All
-                viewAllTrainers();
-                ConsoleUI::pause();
-                break;
-            case 3: // View Assigned Members
-                viewAssignedMembers();
-                ConsoleUI::pause();
-                break;
-            case 4: // Update
-                updateTrainer();
-                ConsoleUI::pause();
-                break;
-            case 5: // Delete
-                deleteTrainer();
-                ConsoleUI::pause();
-                break;
-            default:
-                ConsoleUI::printError("Invalid choice!");
-                ConsoleUI::pause();
-                break;
+            int choice = 0;
+
+            switch (choice) {
+                case 0: trainerService.addTrainer(); ConsoleUI::pause(); break;
+                case 1: trainerService.viewAllTrainers(); ConsoleUI::pause(); break;
+                case 2: trainerService.viewAssignedMembers(); ConsoleUI::pause(); break;
+                // Note: We need to pass the member list to the trainer service for updates
+                case 3: trainerService.updateTrainer(memberService.getAllMembers()); ConsoleUI::pause(); break;
+                case 4: trainerService.deleteTrainer(); ConsoleUI::pause(); break;
+                case 5: return;
             }
         }
     }
