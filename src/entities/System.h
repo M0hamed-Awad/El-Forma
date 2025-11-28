@@ -9,9 +9,9 @@
 #include "../entities/Admin.h"
 #include "../entities/Member.h"
 #include "../entities/Trainer.h"
-#include "../database/AdminDB.h"
-#include "../database/MemberDB.h"
-#include "../database/TrainerDB.h"
+#include "../services/AdminService.h"
+#include "../services/MemberService.h"
+#include "../services/TrainerService.h"
 
 
 using namespace std;
@@ -19,8 +19,9 @@ using namespace std;
 class System {
 private:
     Admin* currentAdmin;  // Nullable admin pointer
-    MemberDB memberDB;    // Database for members
-    TrainerDB trainerDB;  // Database for trainers
+    AdminService adminService;      // Service for admins
+    MemberService memberService;    // Service for members
+    TrainerService trainerService;  // Service for trainers
 
 public:
     // Constructor
@@ -51,38 +52,17 @@ public:
 
     // Login function
     bool login() {
-        ConsoleUI::printHeader("Admin Login");
-        
-        string email = ConsoleUI::getInput("Enter email: ");
-        string password = ConsoleUI::getInput("Enter password: ");
-
-        // Use AdminDB to authenticate
-        AdminDB adminDB;
-        currentAdmin = adminDB.authenticate(email, password);
-        
-        if (currentAdmin != nullptr) {
-            ConsoleUI::printSuccess("Login successful!");
-            ConsoleUI::pause();
-            return true;
-        }
-        
-        ConsoleUI::printError("Invalid email or password!");
-        ConsoleUI::pause();
-        return false;
+        currentAdmin = adminService.login();
+        return currentAdmin != nullptr;
     }
 
     // Logout function
     void logout() {
+        adminService.logout(currentAdmin);
         if (currentAdmin != nullptr) {
-            currentAdmin->logout();
             delete currentAdmin;
             currentAdmin = nullptr;
-            ConsoleUI::printSuccess("Logged out successfully!");
         }
-        else {
-            ConsoleUI::printWarning("No user is currently logged in.");
-        }
-        ConsoleUI::pause();
     }
 
     // Check if admin is logged in
@@ -101,116 +81,22 @@ public:
     
     // Create - Add new member
     void addMember() {
-        ConsoleUI::printHeader("Add New Member");
-        
-        string name = ConsoleUI::getInput("Enter member name: ");
-        string email = ConsoleUI::getInput("Enter member email: ");
-        string password = ConsoleUI::getInput("Enter member password: ");
-        
-        Member* newMember = new Member(name, email, password);
-        memberDB.addMember(newMember);
-        
-        ConsoleUI::printSuccess("Member added successfully!");
-        ConsoleUI::printInfo("Member ID: " + to_string(newMember->getId()));
-        ConsoleUI::printInfo("Join Date: " + newMember->getJoinDate());
+        memberService.addMember();
     }
     
     // Read - View all members
     void viewAllMembers() {
-        ConsoleUI::printHeader("All Members");
-        
-        vector<Member*> members = memberDB.loadMembers();
-        
-        if (members.empty()) {
-            ConsoleUI::printWarning("No members found!");
-            return;
-        }
-        
-        vector<string> headers = {"ID", "Name", "Email", "Join Date", "Subscription"};
-        vector<int> widths = {8, 20, 25, 12, 15};
-        
-        ConsoleUI::printTableHeader(headers, widths);
-        
-        for (const Member* member : members) {
-            vector<string> row = {
-                to_string(member->getId()),
-                member->getName(),
-                member->getEmail(),
-                member->getJoinDate(),
-                to_string(member->getSubscriptionId())
-            };
-            ConsoleUI::printTableRow(row, widths);
-        }
+        memberService.viewAllMembers();
     }
     
     // Update - Update member information
     void updateMember() {
-        ConsoleUI::printHeader("Update Member");
-        
-        vector<Member*> members = memberDB.loadMembers();
-        
-        if (members.empty()) {
-            ConsoleUI::printWarning("No members to update!");
-            return;
-        }
-        
-        int id = ConsoleUI::getIntInput("Enter member ID to update: ");
-        
-        Member* member = memberDB.findMemberById(id);
-        if (member == nullptr) {
-            ConsoleUI::printError("Member not found!");
-            return;
-        }
-        
-        ConsoleUI::printInfo("Current member: " + member->getName());
-        ConsoleUI::printInfo("What would you like to update?");
-        cout << "  1. Subscription ID" << endl;
-        cout << "  0. Cancel" << endl;
-        
-        int choice = ConsoleUI::getChoice();
-        
-        switch (choice) {
-            case 1: {
-                int subId = ConsoleUI::getIntInput("Enter new subscription ID: ");
-                member->setSubscriptionId(subId);
-                memberDB.saveMembers(members);  // Save change
-                ConsoleUI::printSuccess("Subscription updated!");
-                break;
-            }
-            case 0:
-                ConsoleUI::printInfo("Update cancelled");
-                break;
-            default:
-                ConsoleUI::printError("Invalid choice!");
-                break;
-        }
+        memberService.updateMember();
     }
     
     // Delete - Remove a member
     void deleteMember() {
-        ConsoleUI::printHeader("Delete Member");
-        
-        vector<Member*> members = memberDB.loadMembers();
-        
-        if (members.empty()) {
-            ConsoleUI::printWarning("No members to delete!");
-            return;
-        }
-        
-        int id = ConsoleUI::getIntInput("Enter member ID to delete: ");
-        
-        for (auto it = members.begin(); it != members.end(); ++it) {
-            if ((*it)->getId() == id) {
-                string name = (*it)->getName();
-                delete *it;
-                members.erase(it);
-                memberDB.saveMembers(members);  // Save change
-                ConsoleUI::printSuccess("Member '" + name + "' deleted successfully!");
-                return;
-            }
-        }
-        
-        ConsoleUI::printError("Member not found!");
+        memberService.deleteMember();
     }
     
 
@@ -219,172 +105,27 @@ public:
     
     // Create - Add new trainer
     void addTrainer() {
-        ConsoleUI::printHeader("Add New Trainer");
-        
-        string name = ConsoleUI::getInput("Enter trainer name: ");
-        string email = ConsoleUI::getInput("Enter trainer email: ");
-        string password = ConsoleUI::getInput("Enter trainer password: ");
-        string specialty = ConsoleUI::getInput("Enter trainer specialty: ");
-        
-        Trainer* newTrainer = new Trainer(name, email, password, specialty);
-        trainerDB.addTrainer(newTrainer);
-        
-        ConsoleUI::printSuccess("Trainer added successfully!");
-        ConsoleUI::printInfo("Trainer ID: " + to_string(newTrainer->getId()));
+        trainerService.addTrainer();
     }
     
     // Read - View all trainers
     void viewAllTrainers() {
-        ConsoleUI::printHeader("All Trainers");
-        
-        vector<Trainer*> trainers = trainerDB.loadTrainers();
-        
-        if (trainers.empty()) {
-            ConsoleUI::printWarning("No trainers found!");
-            return;
-        }
-        
-        vector<string> headers = {"ID", "Name", "Email", "Specialty", "Assigned Members"};
-        vector<int> widths = {8, 20, 25, 20, 18};
-        
-        ConsoleUI::printTableHeader(headers, widths);
-        
-        for (const Trainer* trainer : trainers) {
-            vector<string> row = {
-                to_string(trainer->getId()),
-                trainer->getName(),
-                trainer->getEmail(),
-                trainer->getTrainerSpecialty(),
-                to_string(trainer->getAssignedMembers().size())
-            };
-            ConsoleUI::printTableRow(row, widths);
-        }
+        trainerService.viewAllTrainers();
     }
 
     // View assigned members
     void viewAssignedMembers() {
-        ConsoleUI::printHeader("Assigned Members");
-        
-        vector<Trainer*> trainers = trainerDB.loadTrainers();
-        
-        if (trainers.empty()) {
-            ConsoleUI::printWarning("No trainers found!");
-            return;
-        }
-        
-        int id = ConsoleUI::getIntInput("Enter trainer ID to view assigned members: ");
-        
-        Trainer* trainer = trainerDB.findTrainerById(id);
-        if (trainer == nullptr) {
-            ConsoleUI::printError("Trainer not found!");
-            return;
-        }
-        
-        vector<string> headers = {"ID", "Name", "Email", "Specialty"};
-        vector<int> widths = {8, 20, 25, 20};
-        
-        ConsoleUI::printTableHeader(headers, widths);
-        
-        for (const Member* member : trainer->getAssignedMembers()) {
-            vector<string> row = {
-                to_string(member->getId()),
-                member->getName(),
-                member->getEmail(),
-                trainer->getTrainerSpecialty()
-            };
-            ConsoleUI::printTableRow(row, widths);
-        }
+        trainerService.viewAssignedMembers();
     }
 
     // Update - Update trainer information
     void updateTrainer() {
-        ConsoleUI::printHeader("Update Trainer");
-        
-        vector<Trainer*> trainers = trainerDB.loadTrainers();
-        
-        if (trainers.empty()) {
-            ConsoleUI::printWarning("No trainers to update!");
-            return;
-        }
-        
-        int id = ConsoleUI::getIntInput("Enter trainer ID to update: ");
-        
-        Trainer* trainer = trainerDB.findTrainerById(id);
-        if (trainer == nullptr) {
-            ConsoleUI::printError("Trainer not found!");
-            return;
-        }
-        
-        ConsoleUI::printInfo("Current trainer: " + trainer->getName());
-        ConsoleUI::printInfo("What would you like to update?");
-        cout << "  1. Specialty" << endl;
-        cout << "  2. Assign Member" << endl;
-        cout << "  0. Cancel" << endl;
-        
-        int choice = ConsoleUI::getChoice();
-        
-        switch (choice) {
-            case 1: {
-                string specialty = ConsoleUI::getInput("Enter new specialty: ");
-                trainer->setTrainerSpecialty(specialty);
-                trainerDB.saveTrainers(trainers);  // Save change
-                ConsoleUI::printSuccess("Specialty updated!");
-                break;
-            }
-            case 2: {
-                vector<Member*> members = memberDB.loadMembers();
-                if (members.empty()) {
-                    ConsoleUI::printWarning("No members available to assign!");
-                    break;
-                }
-                
-                viewAllMembers();
-                int memberId = ConsoleUI::getIntInput("Enter member ID to assign: ");
-                Member* member = memberDB.findMemberById(memberId);
-                
-                if (member != nullptr) {
-                    trainer->assignMember(member);
-                    // Note: Member assignments are not persisted to file
-                    ConsoleUI::printSuccess("Member assigned!");
-                } else {
-                    ConsoleUI::printError("Member not found!");
-                }
-                break;
-            }
-            case 0:
-                ConsoleUI::printInfo("Update cancelled");
-                break;
-            default:
-                ConsoleUI::printError("Invalid choice!");
-                break;
-        }
+        trainerService.updateTrainer(memberService.getAllMembers());
     }
     
     // Delete - Remove a trainer
     void deleteTrainer() {
-        ConsoleUI::printHeader("Delete Trainer");
-        
-        vector<Trainer*> trainers = trainerDB.loadTrainers();
-        
-        if (trainers.empty()) {
-            ConsoleUI::printWarning("No trainers to delete!");
-            return;
-        }
-        
-        int id = ConsoleUI::getIntInput("Enter trainer ID to delete: ");
-        
-        for (auto it = trainers.begin(); it != trainers.end(); ++it) {
-            if ((*it)->getId() == id) {
-                string name = (*it)->getName();
-                delete *it;
-                trainers.erase(it);
-                trainerDB.saveTrainers(trainers);  // Save change
-                ConsoleUI::printSuccess("Trainer '" + name + "' deleted successfully!");
-                return;
-            }
-        }
-        
-        ConsoleUI::printError("Trainer not found!");
+        trainerService.deleteTrainer();
     }
     
 
