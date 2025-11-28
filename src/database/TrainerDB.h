@@ -20,9 +20,9 @@ private:
     void initialize() {
         if (!initialized) {
             // Create fake trainers using add method (IDs auto-assigned)
-            addTrainer(new Trainer("Alex Martinez", "alex@gmail.com", "trainer123", "Cardio"));
-            addTrainer(new Trainer("Emma Brown", "emma@gmail.com", "trainer456", "Strength Training"));
-            addTrainer(new Trainer("Chris Lee", "chris@gmail.com", "trainer789", "Yoga"));
+            addTrainer(new Trainer("Amir", "amir@gmail.com", "trainer123", "Cardio"));
+            addTrainer(new Trainer("Kareem", "kareem@gmail.com", "trainer456", "Strength Training"));
+            addTrainer(new Trainer("Maged", "maged@gmail.com", "trainer789", "Yoga"));
             
             initialized = true;
         }

@@ -20,7 +20,7 @@ private:
     void initialize() {
         if (!initialized) {
             // Create default admin using addAdmin method
-            Admin* defaultAdmin = new Admin("Admin", "admin@gmail.com", "admin");
+            Admin* defaultAdmin = new Admin("Mohamed Rashad", "mohamed@gmail.com", "admin");
             admins.push_back(defaultAdmin);
             initialized = true;
         }

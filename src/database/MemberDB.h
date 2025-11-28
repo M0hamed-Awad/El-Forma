@@ -20,13 +20,13 @@ private:
     void initialize() {
         if (!initialized) {
             // Create fake members using add method (IDs auto-assigned)
-            addMember(new Member("John Doe", "john@gmail.com", "password123", "2024-01-15"));
+            addMember(new Member("Mohamed", "mohamed@gmail.com", "123", "2024-01-15"));
             members.back()->setSubscriptionId(1);
             
-            addMember(new Member("Sarah Johnson", "sarah@gmail.com", "password456", "2024-02-20"));
+            addMember(new Member("Ahmed", "ahmed@gmail.com", "123", "2024-02-20"));
             members.back()->setSubscriptionId(2);
             
-            addMember(new Member("Mike Wilson", "mike@gmail.com", "password789", "2024-03-10"));
+            addMember(new Member("Mostafa", "mostafa@gmail.com", "123", "2024-03-10"));
             members.back()->setSubscriptionId(0); // No subscription
             
             initialized = true;
