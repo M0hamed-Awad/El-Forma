@@ -319,7 +319,40 @@ public:
             ConsoleUI::printTableRow(row, widths);
         }
     }
-    
+
+    // View assigned members
+    void viewAssignedMembers() {
+        ConsoleUI::printHeader("Assigned Members");
+        
+        if (trainers.empty()) {
+            ConsoleUI::printWarning("No trainers found!");
+            return;
+        }
+        
+        int id = ConsoleUI::getIntInput("Enter trainer ID to view assigned members: ");
+        
+        Trainer* trainer = findTrainerById(id);
+        if (trainer == nullptr) {
+            ConsoleUI::printError("Trainer not found!");
+            return;
+        }
+        
+        vector<string> headers = {"ID", "Name", "Email", "Specialty"};
+        vector<int> widths = {8, 20, 25, 20};
+        
+        ConsoleUI::printTableHeader(headers, widths);
+        
+        for (const Member* member : trainer->getAssignedMembers()) {
+            vector<string> row = {
+                to_string(member->getId()),
+                member->getName(),
+                member->getEmail(),
+                trainer->getTrainerSpecialty()
+            };
+            ConsoleUI::printTableRow(row, widths);
+        }
+    }
+
     // Update - Update trainer information
     void updateTrainer() {
         ConsoleUI::printHeader("Update Trainer");
@@ -451,6 +484,7 @@ public:
         vector<string> options = {
             "Add Trainer",
             "View All Trainers",
+            "View Assigned Members",
             "Update Trainer",
             "Delete Trainer"
         };
@@ -508,11 +542,15 @@ public:
                     viewAllTrainers();
                     ConsoleUI::pause();
                     break;
-                case 3: // Update
+                case 3: // View Assigned Members
+                    viewAssignedMembers();
+                    ConsoleUI::pause();
+                    break;
+                case 4: // Update
                     updateTrainer();
                     ConsoleUI::pause();
                     break;
-                case 4: // Delete
+                case 5: // Delete
                     deleteTrainer();
                     ConsoleUI::pause();
                     break;
