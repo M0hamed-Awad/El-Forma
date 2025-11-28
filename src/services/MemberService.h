@@ -45,13 +45,13 @@ public:
 
     // Add new member with UI
     void addMember() {
-        ConsoleUI::printHeader("Add New Member");
+        // Draw the New Form UI
+        vector<string> data = ConsoleUI::getFormData("REGISTER NEW MEMBER",
+            {"Name", "Email", "Password", "Type (Standard/Premium)"});
+
+        if (data.empty()) return; // Cancelled
         
-        string name = ConsoleUI::getInput("Enter member name: ");
-        string email = ConsoleUI::getInput("Enter member email: ");
-        string password = ConsoleUI::getInput("Enter member password: ");
-        
-        Member* newMember = new Member(name, email, password);
+        Member* newMember = new Member(data[0], data[1], data[2], data[3]);
         members.push_back(newMember);
         
         ConsoleUI::printSuccess("Member added successfully!");
@@ -87,41 +87,31 @@ public:
     
     // Update member with UI
     void updateMember() {
-        ConsoleUI::printHeader("Update Member");
-        
         if (members.empty()) {
             ConsoleUI::printWarning("No members to update!");
             return;
         }
-        
-        int id = ConsoleUI::getIntInput("Enter member ID to update: ");
-        
+
+        // Use simple input for ID
+        int id = ConsoleUI::getIntInput("\nEnter member ID to update: ");
+
         Member* member = findMemberById(id);
+
         if (member == nullptr) {
             ConsoleUI::printError("Member not found!");
             return;
         }
+
+        // Use the New Arrow Menu UI
+        vector<string> opts = {"Update Subscription ID", "Cancel"};
+        int choice = ConsoleUI::getMenuSelection("UPDATE MEMBER: " + member->getName(), opts);
         
-        ConsoleUI::printInfo("Current member: " + member->getName());
-        ConsoleUI::printInfo("What would you like to update?");
-        cout << "  1. Subscription ID" << endl;
-        cout << "  0. Cancel" << endl;
-        
-        int choice = ConsoleUI::getChoice();
-        
-        switch (choice) {
-            case 1: {
-                int subId = ConsoleUI::getIntInput("Enter new subscription ID: ");
-                member->setSubscriptionId(subId);
-                ConsoleUI::printSuccess("Subscription updated!");
-                break;
-            }
-            case 0:
-                ConsoleUI::printInfo("Update cancelled");
-                break;
-            default:
-                ConsoleUI::printError("Invalid choice!");
-                break;
+        if (choice == 0) {
+            int subId = ConsoleUI::getIntInput("Enter new subscription ID: ");
+            member->setSubscriptionId(subId);
+            ConsoleUI::printSuccess("Subscription updated!");
+        } else {
+            ConsoleUI::printInfo("Update cancelled");
         }
     }
     
