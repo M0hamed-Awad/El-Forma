@@ -12,14 +12,14 @@ using namespace std;
 // AdminDB class - handles admin-specific database operations (in-memory)
 class AdminDB {
 private:
-    // Static vector to store admins in memory
+    // Vector to store admins in memory (shared across all instances)
     static vector<Admin*> admins;
     static bool initialized;
     
     // Initialize with default admin
-    static void initialize() {
+    void initialize() {
         if (!initialized) {
-            // Create default admin: admin@gmail.com / admin
+            // Create default admin using addAdmin method
             Admin* defaultAdmin = new Admin("Admin", "admin@gmail.com", "admin");
             admins.push_back(defaultAdmin);
             initialized = true;
@@ -33,20 +33,13 @@ public:
     }
 
     // Load all admins (returns the in-memory vector)
-    vector<Admin*> loadAdmins() const {
+    vector<Admin*> loadAdmins() {
         initialize();
         return admins;
     }
 
-    // Save all admins (updates the in-memory vector)
-    bool saveAdmins(const vector<Admin*>& newAdmins) const {
-        // Clear old admins (don't delete, assume caller manages memory)
-        admins = newAdmins;
-        return true;
-    }
-
     // Find admin by email
-    Admin* findAdminByEmail(const string& email) const {
+    Admin* findAdminByEmail(const string& email) {
         initialize();
         
         for (Admin* admin : admins) {
@@ -59,14 +52,14 @@ public:
     }
 
     // Add a new admin
-    bool addAdmin(Admin* admin) const {
+    bool addAdmin(Admin* admin) {
         initialize();
         admins.push_back(admin);
         return true;
     }
 
     // Authenticate admin
-    Admin* authenticate(const string& email, const string& password) const {
+    Admin* authenticate(const string& email, const string& password) {
         initialize();
         
         for (Admin* admin : admins) {
@@ -76,16 +69,6 @@ public:
         }
         
         return nullptr;
-    }
-
-    // Check if data exists (always true for in-memory)
-    bool fileExists() const {
-        return true;
-    }
-
-    // Get filename (no longer relevant but kept for compatibility)
-    string getFilename() const {
-        return "in-memory";
     }
 };
 
