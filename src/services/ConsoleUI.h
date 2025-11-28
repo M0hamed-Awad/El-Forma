@@ -1,35 +1,41 @@
 #ifndef CONSOLE_UI_H
 #define CONSOLE_UI_H
 
+// To prevent Windows Header conflicts
+#define WIN32_LEAN_AND_MEAN
+
 #include <iostream>
 #include <string>
 #include <vector>
 #include <iomanip>
 #include <sstream>
 
+// Windows
 #ifdef _WIN32
-#include <windows.h>
+    #include <windows.h>
+    #include <conio.h>
+// Not Windows
 #else
-#include <sys/ioctl.h>
-#include <unistd.h>
+    #include <sys/ioctl.h>
+    #include <unistd.h>
 #endif
 
 class ConsoleUI {
 private:
     static const int DEFAULT_WIDTH = 80;
 
-    // Get console width
-    static int getConsoleWidth() {
-#ifdef _WIN32
-        CONSOLE_SCREEN_BUFFER_INFO csbi;
-        GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-        return csbi.srWindow.Right - csbi.srWindow.Left + 1;
-#else
-        struct winsize w;
-        ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-        return w.ws_col > 0 ? w.ws_col : DEFAULT_WIDTH;
-#endif
-    }
+    // --- NAVIGATION KEYS ---
+    static const int KEY_UP = 72;
+    static const int KEY_DOWN = 80;
+    static const int KEY_LEFT = 75;
+    static const int KEY_RIGHT = 77;
+    static const int KEY_HOME = 71;
+    static const int KEY_END = 79;
+    
+    // --- ACTION KEYS ---
+    static const int ENTER_KEY = 13;
+    static const int BACKSPACE_KEY = 8;
+    static const int ESC_KEY = 27;
 
 public:
     // Clear screen
