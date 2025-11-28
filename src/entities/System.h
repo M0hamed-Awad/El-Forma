@@ -43,16 +43,6 @@ public:
 
     // ==================== AUTHENTICATION ====================
 
-    // Show authentication menu
-    void showAuthMenu()
-    {
-        vector<string> options = {
-            "Login",
-            "About"};
-
-        ConsoleUI::printMenu("El-Forma Gym Management - Authentication", options);
-    }
-
     // Login function
     bool login()
     {
@@ -143,70 +133,42 @@ public:
 
     // ==================== MENU SYSTEM ====================
 
-    // Show main menu (after login)
-    void showMainMenu()
-    {
-        if (!isLoggedIn())
-        {
-            ConsoleUI::printError("Please login first!");
-            return;
-        }
-
-        vector<string> options = {
-            "Manage Members",
-            "Manage Trainers",
-            "Logout"};
-
-        ConsoleUI::printMenu("El-Forma Gym Management - Main Menu", options);
-    }
-
-    // Show members management menu
-    void showMembersMenu()
-    {
-        vector<string> options = {
-            "Add Member",
-            "View All Members",
-            "Update Member",
-            "Delete Member"};
-
-        ConsoleUI::printMenu("Members Management", options);
-    }
-
-    // Show trainers management menu
-    void showTrainersMenu()
-    {
-        vector<string> options = {
-            "Add Trainer",
-            "View All Trainers",
-            "View Assigned Members",
-            "Update Trainer",
-            "Delete Trainer"};
-
-        ConsoleUI::printMenu("Trainers Management", options);
-    }
-
     // Handle members menu
     void handleMembersMenu()
     {
-        while (true) {
+        while (true)
+        {
             // list of actions for Members
             vector<string> opts = {
                 "Add New Member",
                 "View All Members",
                 "Update Member",
                 "Delete Member",
-                "Back to Dashboard"
-            };
+                "Back to Dashboard"};
 
             // Show the menu here
             int choice = 0;
 
-            switch (choice) {
-                case 0: memberService.addMember(); ConsoleUI::pause(); break;
-                case 1: memberService.viewAllMembers(); ConsoleUI::pause(); break;
-                case 2: memberService.updateMember(); ConsoleUI::pause(); break;
-                case 3: memberService.deleteMember(); ConsoleUI::pause(); break;
-                case 4: return; // Breaks this loop, goes back to run()
+            switch (choice)
+            {
+            case 0:
+                memberService.addMember();
+                ConsoleUI::pause();
+                break;
+            case 1:
+                memberService.viewAllMembers();
+                ConsoleUI::pause();
+                break;
+            case 2:
+                memberService.updateMember();
+                ConsoleUI::pause();
+                break;
+            case 3:
+                memberService.deleteMember();
+                ConsoleUI::pause();
+                break;
+            case 4:
+                return; // Breaks this loop, goes back to run()
             }
         }
     }
@@ -214,27 +176,44 @@ public:
     // Handle trainers menu
     void handleTrainersMenu()
     {
-        while (true) {
-             // list of actions for Members
+        while (true)
+        {
+            // list of actions for Members
             vector<string> opts = {
                 "Add New Trainer",
                 "View All Trainers",
                 "View Assigned Members",
                 "Update Trainer",
                 "Delete Trainer",
-                "Back to Dashboard"
-            };
+                "Back to Dashboard"};
 
             int choice = 0;
 
-            switch (choice) {
-                case 0: trainerService.addTrainer(); ConsoleUI::pause(); break;
-                case 1: trainerService.viewAllTrainers(); ConsoleUI::pause(); break;
-                case 2: trainerService.viewAssignedMembers(); ConsoleUI::pause(); break;
-                // Note: We need to pass the member list to the trainer service for updates
-                case 3: trainerService.updateTrainer(memberService.getAllMembers()); ConsoleUI::pause(); break;
-                case 4: trainerService.deleteTrainer(); ConsoleUI::pause(); break;
-                case 5: return;
+            switch (choice)
+            {
+            case 0:
+                trainerService.addTrainer();
+                ConsoleUI::pause();
+                break;
+            case 1:
+                trainerService.viewAllTrainers();
+                ConsoleUI::pause();
+                break;
+            case 2:
+                trainerService.viewAssignedMembers();
+                ConsoleUI::pause();
+                break;
+            // Note: We need to pass the member list to the trainer service for updates
+            case 3:
+                trainerService.updateTrainer(memberService.getAllMembers());
+                ConsoleUI::pause();
+                break;
+            case 4:
+                trainerService.deleteTrainer();
+                ConsoleUI::pause();
+                break;
+            case 5:
+                return;
             }
         }
     }
@@ -249,23 +228,28 @@ public:
             {
                 // Define the options
                 vector<string> authOptions = {
-                    "Login to System",
+                    "Login",
                     "About El-Forma",
-                    "Exit"
-                };
+                    "Exit"};
 
                 // Show the Menu
-                int choice = 0; 
+                int choice = ConsoleUI::getMenuSelection("WELCOME TO EL-FORMA", authOptions);
 
                 // Handle selection (Index 0, 1, 2)
-                if (choice == 0) {
-                    if (!login()) continue; // If login fails, restart loop
-                } 
-                else if (choice == 1) {
+                // Login
+                if (choice == 0)
+                {
+                    if (!login())
+                        continue; // If login fails, restart loop
+                }
+                // About
+                else if (choice == 1)
+                {
                     ConsoleUI::printInfo("El-Forma System v2.0 - ITI Project");
                     ConsoleUI::pause();
                 }
-                else {
+                else
+                {
                     return; // Exit the program
                 }
             }
@@ -278,7 +262,7 @@ public:
                     "Logout"};
 
                 // get menu choice here
-                int choice = 1; 
+                int choice = ConsoleUI::getMenuSelection("MAIN DASHBOARD", mainOptions);
 
                 // Handle selection (Index 0, 1, 2)
                 switch (choice)
@@ -298,4 +282,4 @@ public:
     }
 };
 
-#endif // SYSTEM_H
+#endif
