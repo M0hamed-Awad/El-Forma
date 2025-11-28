@@ -68,16 +68,6 @@ public:
 
     // Setters
     void setSubscriptionId(int subscId) { subscriptionId = subscId; }
-
-    // Functions
-    void manageAccount(int userId) override {
-        cout << "Member " << name << " Profile | ID: " << id << endl;
-        cout << "Joined: " << joinDate << endl;
-    }
-    
-    void checkIn(){
-        cout << "Member " << name << " checked in on " << getCurrentDate() << "." << endl;
-    }
 };
 
 #endif

@@ -12,7 +12,6 @@
 #include "../database/AdminDB.h"
 #include "../database/MemberDB.h"
 #include "../database/TrainerDB.h"
-#include "../database/IDManager.h"
 
 
 using namespace std;
@@ -20,46 +19,22 @@ using namespace std;
 class System {
 private:
     Admin* currentAdmin;  // Nullable admin pointer
-    vector<Member*> members;  // List of members
-    vector<Trainer*> trainers;  // List of trainers (coaches)
+    MemberDB memberDB;    // Database for members
+    TrainerDB trainerDB;  // Database for trainers
 
 public:
     // Constructor
     System() : currentAdmin(nullptr) {
-        // Load members and trainers from database first
-        loadMembersFromDB();
-        loadTrainersFromDB();
-        
-        // Initialize separate ID counters for each entity type
-        int maxMemberId = IDManager::getLastID("Member");
-        int maxTrainerId = IDManager::getLastID("Trainer");
-        
-        Member::setNextMemberId(maxMemberId);
-        Trainer::setNextTrainerId(maxTrainerId);
+        // Database classes initialize themselves with test data
     }
 
     // Destructor
     ~System() {
-        // Save data before cleanup
-        saveMembersToDB();
-        saveTrainersToDB();
-        
         if (currentAdmin != nullptr) {
             delete currentAdmin;
             currentAdmin = nullptr;
         }
-        
-        // Clean up members
-        for (Member* member : members) {
-            delete member;
-        }
-        members.clear();
-        
-        // Clean up trainers
-        for (Trainer* trainer : trainers) {
-            delete trainer;
-        }
-        trainers.clear();
+        // Note: Database classes manage their own memory
     }
 
     // ==================== AUTHENTICATION ====================
@@ -120,35 +95,7 @@ public:
         return currentAdmin;
     }
 
-    // ==================== DATABASE PERSISTENCE ====================
-    
-    // Load members from database
-    void loadMembersFromDB() {
-        Member::setLoadingMode(true);  // Disable auto-increment during load
-        MemberDB memberDB;
-        members = memberDB.loadMembers();
-        Member::setLoadingMode(false);  // Re-enable auto-increment
-    }
-    
-    // Save members to database
-    void saveMembersToDB() {
-        MemberDB memberDB;
-        memberDB.saveMembers(members);
-    }
-    
-    // Load trainers from database
-    void loadTrainersFromDB() {
-        Trainer::setLoadingMode(true);  // Disable auto-increment during load
-        TrainerDB trainerDB;
-        trainers = trainerDB.loadTrainers();
-        Trainer::setLoadingMode(false);  // Re-enable auto-increment
-    }
-    
-    // Save trainers to database
-    void saveTrainersToDB() {
-        TrainerDB trainerDB;
-        trainerDB.saveTrainers(trainers);
-    }
+
 
     // ==================== MEMBER CRUD ====================
     
@@ -161,10 +108,7 @@ public:
         string password = ConsoleUI::getInput("Enter member password: ");
         
         Member* newMember = new Member(name, email, password);
-        members.push_back(newMember);
-        
-        // Save to database
-        saveMembersToDB();
+        memberDB.addMember(newMember);
         
         ConsoleUI::printSuccess("Member added successfully!");
         ConsoleUI::printInfo("Member ID: " + to_string(newMember->getId()));
@@ -174,6 +118,8 @@ public:
     // Read - View all members
     void viewAllMembers() {
         ConsoleUI::printHeader("All Members");
+        
+        vector<Member*> members = memberDB.loadMembers();
         
         if (members.empty()) {
             ConsoleUI::printWarning("No members found!");
@@ -201,6 +147,8 @@ public:
     void updateMember() {
         ConsoleUI::printHeader("Update Member");
         
+        vector<Member*> members = memberDB.loadMembers();
+        
         if (members.empty()) {
             ConsoleUI::printWarning("No members to update!");
             return;
@@ -208,7 +156,7 @@ public:
         
         int id = ConsoleUI::getIntInput("Enter member ID to update: ");
         
-        Member* member = findMemberById(id);
+        Member* member = memberDB.findMemberById(id);
         if (member == nullptr) {
             ConsoleUI::printError("Member not found!");
             return;
@@ -225,7 +173,7 @@ public:
             case 1: {
                 int subId = ConsoleUI::getIntInput("Enter new subscription ID: ");
                 member->setSubscriptionId(subId);
-                saveMembersToDB();  // Save change
+                memberDB.saveMembers(members);  // Save change
                 ConsoleUI::printSuccess("Subscription updated!");
                 break;
             }
@@ -242,6 +190,8 @@ public:
     void deleteMember() {
         ConsoleUI::printHeader("Delete Member");
         
+        vector<Member*> members = memberDB.loadMembers();
+        
         if (members.empty()) {
             ConsoleUI::printWarning("No members to delete!");
             return;
@@ -254,7 +204,7 @@ public:
                 string name = (*it)->getName();
                 delete *it;
                 members.erase(it);
-                saveMembersToDB();  // Save change
+                memberDB.saveMembers(members);  // Save change
                 ConsoleUI::printSuccess("Member '" + name + "' deleted successfully!");
                 return;
             }
@@ -263,15 +213,7 @@ public:
         ConsoleUI::printError("Member not found!");
     }
     
-    // Helper - Find member by ID
-    Member* findMemberById(int id) {
-        for (Member* member : members) {
-            if (member->getId() == id) {
-                return member;
-            }
-        }
-        return nullptr;
-    }
+
     
     // ==================== TRAINER CRUD ====================
     
@@ -285,10 +227,7 @@ public:
         string specialty = ConsoleUI::getInput("Enter trainer specialty: ");
         
         Trainer* newTrainer = new Trainer(name, email, password, specialty);
-        trainers.push_back(newTrainer);
-        
-        // Save to database
-        saveTrainersToDB();
+        trainerDB.addTrainer(newTrainer);
         
         ConsoleUI::printSuccess("Trainer added successfully!");
         ConsoleUI::printInfo("Trainer ID: " + to_string(newTrainer->getId()));
@@ -297,6 +236,8 @@ public:
     // Read - View all trainers
     void viewAllTrainers() {
         ConsoleUI::printHeader("All Trainers");
+        
+        vector<Trainer*> trainers = trainerDB.loadTrainers();
         
         if (trainers.empty()) {
             ConsoleUI::printWarning("No trainers found!");
@@ -319,10 +260,47 @@ public:
             ConsoleUI::printTableRow(row, widths);
         }
     }
-    
+
+    // View assigned members
+    void viewAssignedMembers() {
+        ConsoleUI::printHeader("Assigned Members");
+        
+        vector<Trainer*> trainers = trainerDB.loadTrainers();
+        
+        if (trainers.empty()) {
+            ConsoleUI::printWarning("No trainers found!");
+            return;
+        }
+        
+        int id = ConsoleUI::getIntInput("Enter trainer ID to view assigned members: ");
+        
+        Trainer* trainer = trainerDB.findTrainerById(id);
+        if (trainer == nullptr) {
+            ConsoleUI::printError("Trainer not found!");
+            return;
+        }
+        
+        vector<string> headers = {"ID", "Name", "Email", "Specialty"};
+        vector<int> widths = {8, 20, 25, 20};
+        
+        ConsoleUI::printTableHeader(headers, widths);
+        
+        for (const Member* member : trainer->getAssignedMembers()) {
+            vector<string> row = {
+                to_string(member->getId()),
+                member->getName(),
+                member->getEmail(),
+                trainer->getTrainerSpecialty()
+            };
+            ConsoleUI::printTableRow(row, widths);
+        }
+    }
+
     // Update - Update trainer information
     void updateTrainer() {
         ConsoleUI::printHeader("Update Trainer");
+        
+        vector<Trainer*> trainers = trainerDB.loadTrainers();
         
         if (trainers.empty()) {
             ConsoleUI::printWarning("No trainers to update!");
@@ -331,7 +309,7 @@ public:
         
         int id = ConsoleUI::getIntInput("Enter trainer ID to update: ");
         
-        Trainer* trainer = findTrainerById(id);
+        Trainer* trainer = trainerDB.findTrainerById(id);
         if (trainer == nullptr) {
             ConsoleUI::printError("Trainer not found!");
             return;
@@ -349,11 +327,12 @@ public:
             case 1: {
                 string specialty = ConsoleUI::getInput("Enter new specialty: ");
                 trainer->setTrainerSpecialty(specialty);
-                saveTrainersToDB();  // Save change
+                trainerDB.saveTrainers(trainers);  // Save change
                 ConsoleUI::printSuccess("Specialty updated!");
                 break;
             }
             case 2: {
+                vector<Member*> members = memberDB.loadMembers();
                 if (members.empty()) {
                     ConsoleUI::printWarning("No members available to assign!");
                     break;
@@ -361,7 +340,7 @@ public:
                 
                 viewAllMembers();
                 int memberId = ConsoleUI::getIntInput("Enter member ID to assign: ");
-                Member* member = findMemberById(memberId);
+                Member* member = memberDB.findMemberById(memberId);
                 
                 if (member != nullptr) {
                     trainer->assignMember(member);
@@ -385,6 +364,8 @@ public:
     void deleteTrainer() {
         ConsoleUI::printHeader("Delete Trainer");
         
+        vector<Trainer*> trainers = trainerDB.loadTrainers();
+        
         if (trainers.empty()) {
             ConsoleUI::printWarning("No trainers to delete!");
             return;
@@ -397,7 +378,7 @@ public:
                 string name = (*it)->getName();
                 delete *it;
                 trainers.erase(it);
-                saveTrainersToDB();  // Save change
+                trainerDB.saveTrainers(trainers);  // Save change
                 ConsoleUI::printSuccess("Trainer '" + name + "' deleted successfully!");
                 return;
             }
@@ -406,15 +387,7 @@ public:
         ConsoleUI::printError("Trainer not found!");
     }
     
-    // Helper - Find trainer by ID
-    Trainer* findTrainerById(int id) {
-        for (Trainer* trainer : trainers) {
-            if (trainer->getId() == id) {
-                return trainer;
-            }
-        }
-        return nullptr;
-    }
+
     
     // ==================== MENU SYSTEM ====================
 
@@ -428,8 +401,6 @@ public:
         vector<string> options = {
             "Manage Members",
             "Manage Trainers",
-            "Generate Report",
-            "Manage Account",
             "Logout"
         };
         
@@ -453,6 +424,7 @@ public:
         vector<string> options = {
             "Add Trainer",
             "View All Trainers",
+            "View Assigned Members",
             "Update Trainer",
             "Delete Trainer"
         };
@@ -510,11 +482,15 @@ public:
                     viewAllTrainers();
                     ConsoleUI::pause();
                     break;
-                case 3: // Update
+                case 3: // View Assigned Members
+                    viewAssignedMembers();
+                    ConsoleUI::pause();
+                    break;
+                case 4: // Update
                     updateTrainer();
                     ConsoleUI::pause();
                     break;
-                case 4: // Delete
+                case 5: // Delete
                     deleteTrainer();
                     ConsoleUI::pause();
                     break;
@@ -568,15 +544,7 @@ public:
                     case 2: // Manage Trainers
                         handleTrainersMenu();
                         break;
-                    case 3: // Generate Report
-                        currentAdmin->generateReport();
-                        ConsoleUI::pause();
-                        break;
-                    case 4: // Manage Account
-                        currentAdmin->manageAccount(currentAdmin->getId());
-                        ConsoleUI::pause();
-                        break;
-                    case 5: // Logout
+                    case 3: // Logout
                         logout();
                         break;
                     default:

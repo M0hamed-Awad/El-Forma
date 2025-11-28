@@ -14,22 +14,22 @@ public:
     Admin(string userName, string userEmail, string userPassword)
         : User(userName, userEmail, userPassword) {}
 
-    // Implement virtual method from User
-    void manageAccount(int userId) override {
-        cout << "Admin managing account for user ID: " << userId << endl;
-        // Logic to manage account later
+            // Functions
+    bool login(string userInputEmail, string userInputPassword)
+    {
+        if (userInputEmail == email && userInputPassword == password)
+        {
+            cout << "Login Successful! Welcome, " << name << "." << endl;
+            return true;
+        }
+        else
+        {
+            cout << "Invalid email or password." << endl;
+            return false;
+        }
     }
 
-    // Admin-specific functions
-    void addMember() {
-        cout << ">> SUCCESS: addMember() function called!" << endl;
-        cout << ">> (Logic to add member later)" << endl;
-    }
-
-    void generateReport() {
-        cout << ">> SUCCESS: generateReport() function called!" << endl;
-        cout << ">> (Stats will appear here)" << endl;
-    }
+    void logout() { cout << "Goodbye, " << name << "!" << endl; }
 
     // Destructor
     ~Admin() override {}

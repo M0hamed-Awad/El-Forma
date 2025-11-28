@@ -28,25 +28,6 @@ public:
     // Setters
     void setId(int newId) { id = newId; }
 
-    // Functions
-    bool login(string userInputEmail, string userInputPassword)
-    {
-        if (userInputEmail == email && userInputPassword == password)
-        {
-            cout << "Login Successful! Welcome, " << name << "." << endl;
-            return true;
-        }
-        else
-        {
-            cout << "Invalid email or password." << endl;
-            return false;
-        }
-    }
-
-    void logout() { cout << "Goodbye, " << name << "!" << endl; }
-
-    virtual void manageAccount(int userId) = 0;
-
     virtual ~User() {}
 };
 

@@ -36,13 +36,6 @@ public:
     // Setters
     void setTrainerSpecialty(string trainerSpecialty) { specialty = trainerSpecialty; }
 
-    // Functions
-    void manageAccount(int userId) override
-    {
-        cout << "Trainer " << name << " Profile | ID: " << id << endl;
-        cout << "Specialty: " << specialty << endl;
-    }
-
     void viewAssignedMembers()
     {
         cout << "Trainer " << this->name << " assigned members are:" << endl;
