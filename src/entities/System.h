@@ -188,35 +188,25 @@ public:
     // Handle members menu
     void handleMembersMenu()
     {
-        while (true)
-        {
-            showMembersMenu();
-            int choice = ConsoleUI::getChoice();
+        while (true) {
+            // list of actions for Members
+            vector<string> opts = {
+                "Add New Member",
+                "View All Members",
+                "Update Member",
+                "Delete Member",
+                "Back to Dashboard"
+            };
 
-            switch (choice)
-            {
-            case 0: // Back
-                return;
-            case 1: // Add
-                addMember();
-                ConsoleUI::pause();
-                break;
-            case 2: // View All
-                viewAllMembers();
-                ConsoleUI::pause();
-                break;
-            case 3: // Update
-                updateMember();
-                ConsoleUI::pause();
-                break;
-            case 4: // Delete
-                deleteMember();
-                ConsoleUI::pause();
-                break;
-            default:
-                ConsoleUI::printError("Invalid choice!");
-                ConsoleUI::pause();
-                break;
+            // Show the menu here
+            int choice = 0;
+
+            switch (choice) {
+                case 0: memberService.addMember(); ConsoleUI::pause(); break;
+                case 1: memberService.viewAllMembers(); ConsoleUI::pause(); break;
+                case 2: memberService.updateMember(); ConsoleUI::pause(); break;
+                case 3: memberService.deleteMember(); ConsoleUI::pause(); break;
+                case 4: return; // Breaks this loop, goes back to run()
             }
         }
     }
