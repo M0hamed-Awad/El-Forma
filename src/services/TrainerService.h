@@ -115,8 +115,6 @@ public:
     
     // Update trainer with UI
     void updateTrainer(vector<Member*> availableMembers) {
-        ConsoleUI::printHeader("Update Trainer");
-        
         if (trainers.empty()) {
             ConsoleUI::printWarning("No trainers to update!");
             return;
@@ -130,67 +128,63 @@ public:
             return;
         }
         
-        ConsoleUI::printInfo("Current trainer: " + trainer->getName());
-        ConsoleUI::printInfo("What would you like to update?");
-        cout << "  1. Specialty" << endl;
-        cout << "  2. Assign Member" << endl;
-        cout << "  0. Cancel" << endl;
+        //  Use the new Arrow Menu for choices
+        vector<string> opts = {
+            "Update Specialty", 
+            "Assign Member", 
+            "Cancel"
+        };
         
-        int choice = ConsoleUI::getChoice();
+        int choice = ConsoleUI::getMenuSelection("UPDATE TRAINER: " + trainer->getName(), opts);
         
-        switch (choice) {
-            case 1: {
-                string specialty = ConsoleUI::getInput("Enter new specialty: ");
-                trainer->setTrainerSpecialty(specialty);
-                ConsoleUI::printSuccess("Specialty updated!");
-                break;
+        // Handle selection by Index
+        if (choice == 0) { // Update Specialty
+            string specialty = ConsoleUI::getInput("Enter new specialty: ");
+            trainer->setTrainerSpecialty(specialty);
+            ConsoleUI::printSuccess("Specialty updated!");
+        } 
+        else if (choice == 1) { // Assign Member
+            if (availableMembers.empty()) {
+                ConsoleUI::printWarning("No members available to assign!");
+                return;
             }
-            case 2: {
-                if (availableMembers.empty()) {
-                    ConsoleUI::printWarning("No members available to assign!");
+            
+            // Display available members table
+            ConsoleUI::printHeader("Available Members");
+            vector<string> headers = {"ID", "Name", "Email"};
+            vector<int> widths = {8, 20, 25};
+            ConsoleUI::printTableHeader(headers, widths);
+            
+            for (const Member* member : availableMembers) {
+                vector<string> row = {
+                    to_string(member->getId()),
+                    member->getName(),
+                    member->getEmail()
+                };
+                ConsoleUI::printTableRow(row, widths);
+            }
+            
+            // Select member
+            int memberId = ConsoleUI::getIntInput("Enter member ID to assign: ");
+            
+            Member* memberToAssign = nullptr;
+            for (Member* m : availableMembers) {
+                if (m->getId() == memberId) {
+                    memberToAssign = m;
                     break;
                 }
-                
-                // Display available members
-                ConsoleUI::printHeader("Available Members");
-                vector<string> headers = {"ID", "Name", "Email"};
-                vector<int> widths = {8, 20, 25};
-                ConsoleUI::printTableHeader(headers, widths);
-                
-                for (const Member* member : availableMembers) {
-                    vector<string> row = {
-                        to_string(member->getId()),
-                        member->getName(),
-                        member->getEmail()
-                    };
-                    ConsoleUI::printTableRow(row, widths);
-                }
-                
-                int memberId = ConsoleUI::getIntInput("Enter member ID to assign: ");
-                
-                // Find member in available members
-                Member* memberToAssign = nullptr;
-                for (Member* m : availableMembers) {
-                    if (m->getId() == memberId) {
-                        memberToAssign = m;
-                        break;
-                    }
-                }
-                
-                if (memberToAssign != nullptr) {
-                    trainer->assignMember(memberToAssign);
-                    ConsoleUI::printSuccess("Member assigned!");
-                } else {
-                    ConsoleUI::printError("Member not found!");
-                }
-                break;
             }
-            case 0:
-                ConsoleUI::printInfo("Update cancelled");
-                break;
-            default:
-                ConsoleUI::printError("Invalid choice!");
-                break;
+            
+            if (memberToAssign != nullptr) {
+                trainer->assignMember(memberToAssign);
+                // Note: Success message is handled inside trainer->assignMember
+                // But we can add a pause here if needed
+            } else {
+                ConsoleUI::printError("Member not found!");
+            }
+        } 
+        else { // Cancel (Choice 2 or ESC)
+            ConsoleUI::printInfo("Update cancelled");
         }
     }
     
