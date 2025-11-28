@@ -78,8 +78,6 @@ classDiagram
         +getId() int
         +getName() string
         +getEmail() string
-        +login(email, password) bool
-        +logout() void
     }
     
     class Admin {
