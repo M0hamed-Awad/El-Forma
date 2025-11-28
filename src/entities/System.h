@@ -147,7 +147,9 @@ public:
                 "Back to Dashboard"};
 
             // Show the menu here
-            int choice = 0;
+            int choice = ConsoleUI::getMenuSelection("MEMBERS MANAGEMENT", opts);
+            if (choice == -1)
+                return; // ESC pressed -> Go back
 
             switch (choice)
             {
@@ -187,7 +189,7 @@ public:
                 "Delete Trainer",
                 "Back to Dashboard"};
 
-            int choice = 0;
+            int choice = ConsoleUI::getMenuSelection("TRAINERS MANAGEMENT", opts);
 
             switch (choice)
             {
@@ -247,6 +249,11 @@ public:
                 {
                     ConsoleUI::printInfo("El-Forma System v2.0 - ITI Project");
                     ConsoleUI::pause();
+                }
+                else if (choice == -1)
+                { // ESC pressed -> Logout
+                    logout();
+                    continue; // Restart loop to show Welcome Screen
                 }
                 else
                 {

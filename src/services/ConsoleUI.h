@@ -41,8 +41,10 @@ private:
     static const int ESC_KEY = 27;
 
     // Clears any leftover keystrokes (prevents double-clicking menus)
-    static void flushInput() {
-        while (_kbhit()) {
+    static void flushInput()
+    {
+        while (_kbhit())
+        {
             _getch();
         }
     }
@@ -228,32 +230,31 @@ public:
     {
         flushInput(); // Clears the previous Enter key
         int currentSelection = 0;
+        char key;
 
         while (true)
         {
             drawMenu(title, options, currentSelection);
 
-            bool isEnterPressed = handleMenuNavigation(currentSelection, options);
-            if (isEnterPressed)
-                return currentSelection;
-        }
-    }
+            // --- MANUAL KEY HANDLING ---
+            key = _getch();
 
-    // Get double input with validation
-    static double getDoubleInput(const std::string &prompt)
-    {
-        std::string input;
-        double value;
-        while (true)
-        {
-            std::cout << prompt;
-            std::getline(std::cin, input);
-            std::stringstream ss(input);
-            if (ss >> value && ss.eof())
+            if (key == -32 || key == 224)
             {
-                return value;
+                key = _getch();
+                if (key == KEY_UP)
+                    moveUp(currentSelection, options);
+                else if (key == KEY_DOWN)
+                    moveDown(currentSelection, options);
             }
-            printError("Invalid input. Please enter a valid number.");
+            else if (key == ENTER_KEY)
+            {
+                return currentSelection;
+            }
+            else if (key == ESC_KEY)
+            {
+                return -1; // SIGNAL FOR "BACK"
+            }
         }
     }
 
@@ -447,6 +448,10 @@ public:
                     currentField++;
                 else
                     finished = true;
+            }
+            else if (ch == ESC_KEY)
+            {
+                return {}; // cancel
             }
             else
             {
