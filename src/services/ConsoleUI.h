@@ -1,6 +1,8 @@
 #ifndef CONSOLE_UI_H
 #define CONSOLE_UI_H
 
+using namespace std;
+
 // To prevent Windows Header conflicts
 #define WIN32_LEAN_AND_MEAN
 
@@ -119,37 +121,13 @@ public:
     // Print warning message
     static void printWarning(string msg)
     {
-        cout << "\n\033[33m[WARNING] " << msg << "\033[0m" << endl;
+        cout << "\n\033[31m[WARNING] " << msg << "\033[0m" << endl;
     }
 
     // Print info message
     static void printInfo(string msg)
     {
         cout << "\n[INFO] " << msg << endl;
-    }
-
-    // Print horizontal line
-    static void printLine(char ch = '=', int width = 0)
-    {
-        if (width == 0)
-            width = getConsoleWidth();
-        std::cout << std::string(width, ch) << std::endl;
-    }
-
-    // Print centered text
-    static void printCentered(const std::string &text, int width = 0)
-    {
-        if (width == 0)
-            width = getConsoleWidth();
-        int padding = (width - text.length()) / 2;
-        if (padding > 0)
-        {
-            std::cout << std::string(padding, ' ') << text << std::endl;
-        }
-        else
-        {
-            std::cout << text << std::endl;
-        }
     }
 
     // ------------ DRAWING THE MENU HELPERS ------------
@@ -253,27 +231,6 @@ public:
         }
     }
 
-    // Print menu with options
-    static void printMenu(const std::string &title, const std::vector<std::string> &options)
-    {
-        printHeader(title);
-        for (size_t i = 0; i < options.size(); i++)
-        {
-            std::cout << "  " << (i + 1) << ". " << options[i] << std::endl;
-        }
-        std::cout << "  0. Exit/Back" << std::endl;
-        printLine('-');
-    }
-
-    // Print sub-header
-    static void printSubHeader(const std::string &text)
-    {
-        std::cout << std::endl;
-        printLine('-');
-        std::cout << "  " << text << std::endl;
-        printLine('-');
-    }
-
     // Get double input with validation
     static double getDoubleInput(const std::string &prompt)
     {
@@ -310,27 +267,6 @@ public:
         cout << endl;
     }
 
-    // Print a box with content
-    static void printBox(const std::string &content, int width = 60)
-    {
-        printLine('+', width);
-
-        std::istringstream iss(content);
-        std::string line;
-        while (std::getline(iss, line))
-        {
-            int padding = width - line.length() - 4;
-            std::cout << "| " << line;
-            if (padding > 0)
-            {
-                std::cout << std::string(padding, ' ');
-            }
-            std::cout << " |" << std::endl;
-        }
-
-        printLine('+', width);
-    }
-
     // Print choice prompt
     static int getChoice(const std::string &prompt = "Enter your choice: ")
     {
@@ -344,14 +280,6 @@ public:
         std::cout << message << " (y/n): ";
         std::getline(std::cin, input);
         return (input == "y" || input == "Y" || input == "yes" || input == "Yes");
-    }
-
-    // Print section divider
-    static void printDivider()
-    {
-        std::cout << std::endl;
-        printLine('*', 40);
-        std::cout << std::endl;
     }
 
     // ------------ DRAWING UI OF THE FORM HELPERS ------------
@@ -433,11 +361,15 @@ public:
         }
     }
 
-    static void handleCharacter(int ch, string &fieldValue, int targetCol, int COL2_X)
+    static void handleCharacter(int ch, string &fieldValue, int targetCol, int COL2_X, int currentField)
     {
         if (ch >= 32 && ch <= 126) // Printable
         {
-            if (targetCol < COL2_X - 2)
+            // FIX
+            // Allow typing if: [45 -2 = 43]
+            // 1. We are in Left Col AND have space (targetCol < 43)
+            // 2. OR We are in Right Col (currentField is Odd)
+            if ((targetCol < COL2_X - 2) || (currentField % 2 != 0))
             {
                 fieldValue += (char)ch;
                 cout << (char)ch;
@@ -509,7 +441,8 @@ public:
             }
             else
             {
-                handleCharacter(ch, inputs[currentField], targetCol, 45);
+                // FIX: Pass 'currentField' as the last argument
+                handleCharacter(ch, inputs[currentField], targetCol, 45, currentField);
             }
         }
 
