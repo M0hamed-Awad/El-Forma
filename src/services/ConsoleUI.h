@@ -152,6 +152,8 @@ public:
         }
     }
 
+    // ------------ DRAWING THE MENU HELPERS ------------
+
     // Draw Menu Title
     static void drawMenuTitle(const string &title)
     {
@@ -191,7 +193,7 @@ public:
     // Handle Arrow UP
     static void moveUp(int &currentSelection, const vector<string> &options)
     {
-        currentSelection--; // Updating the Index Value
+        currentSelection--;       // Updating the Index Value
         if (currentSelection < 0) // For Circular Functionality
             currentSelection = options.size() - 1;
     }
@@ -199,7 +201,7 @@ public:
     // Handle Arrow DOWN
     static void moveDown(int &currentSelection, const vector<string> &options)
     {
-        currentSelection++; // Updating the Index Value
+        currentSelection++;                     // Updating the Index Value
         if (currentSelection >= options.size()) // For Circular Functionality
             currentSelection = 0;
     }
@@ -235,7 +237,7 @@ public:
         return false;
     }
 
-    // --- DRAWING THE MENU ---
+    // ------------ DRAWING THE MENU ------------
     // Returns index (0, 1, 2...)
     static int getMenuSelection(string title, vector<string> options)
     {
@@ -366,6 +368,169 @@ public:
         printLine('*', 40);
         std::cout << std::endl;
     }
+
+    // ------------ DRAWING UI OF THE FORM HELPERS ------------
+    static void drawFormTitle(const string &title)
+    {
+        clear();
+        cout << "=== " << title << " ===\n";
+        cout << string(70, '-') << "\n";
+    }
+
+    static void drawFieldLabels(
+        const vector<string> &fieldLabels,
+        vector<int> &fieldRows,
+        vector<int> &fieldCols)
+    {
+        int startRow = 3;
+        const int COL1_X = 3;
+        const int COL2_X = 45;
+
+        for (int i = 0; i < fieldLabels.size(); i++)
+        {
+            int currentRow = startRow + (i / 2);
+            int labelCol = (i % 2 == 0) ? COL1_X : COL2_X;
+
+            moveCursor(currentRow, labelCol);
+            cout << fieldLabels[i] << ": ";
+
+            int inputStartCol = labelCol + fieldLabels[i].length() + 2;
+
+            fieldRows.push_back(currentRow);
+            fieldCols.push_back(inputStartCol);
+        }
+    }
+
+    static int drawFooter(int fieldCount)
+    {
+        int footerRow = 3 + (fieldCount / 2) + 2;
+
+        moveCursor(footerRow, 1);
+        cout << string(70, '-') << "\n";
+        cout << "[ENTER] Next/Submit   [ESC] Cancel   [ARROWS] Navigate";
+
+        return footerRow;
+    }
+
+    // ------------ THE FORM NAVIGATION HELPERS ------------
+
+    static void moveUpField(int &current, int fieldCount)
+    {
+        if (current >= 2)
+            current -= 2;
+    }
+
+    static void moveDownField(int &current, int fieldCount)
+    {
+        if (current + 2 < fieldCount)
+            current += 2;
+    }
+
+    static void moveLeftField(int &current)
+    {
+        if (current > 0)
+            current--;
+    }
+
+    static void moveRightField(int &current, int fieldCount)
+    {
+        if (current < fieldCount - 1)
+            current++;
+    }
+
+    // ------------ THE FORM CHARACTER HELPERS ------------
+    static void handleBackspace(string &fieldValue)
+    {
+        if (!fieldValue.empty())
+        {
+            fieldValue.pop_back();
+            cout << "\b \b";
+        }
+    }
+
+    static void handleCharacter(int ch, string &fieldValue, int targetCol, int COL2_X)
+    {
+        if (ch >= 32 && ch <= 126) // Printable
+        {
+            if (targetCol < COL2_X - 2)
+            {
+                fieldValue += (char)ch;
+                cout << (char)ch;
+            }
+        }
+    }
+
+    // ------------ DETECTING ARROWS ------------
+    static void handleArrowKeys(int ch, int &currentField, int fieldCount)
+    {
+        ch = _getch();
+
+        if (ch == KEY_UP)
+            moveUpField(currentField, fieldCount);
+        else if (ch == KEY_DOWN)
+            moveDownField(currentField, fieldCount);
+        else if (ch == KEY_LEFT)
+            moveLeftField(currentField);
+        else if (ch == KEY_RIGHT)
+            moveRightField(currentField, fieldCount);
+        else if (ch == KEY_HOME)
+            currentField = 0;
+        else if (ch == KEY_END)
+            currentField = fieldCount - 1;
+    }
+
+    // ------------ DRAWING THE FORM ------------
+    static vector<string> getFormData(string title, vector<string> fieldLabels)
+    {
+        drawFormTitle(title);
+
+        vector<int> fieldRows;
+        vector<int> fieldCols;
+
+        drawFieldLabels(fieldLabels, fieldRows, fieldCols);
+        int footerRow = drawFooter(fieldLabels.size());
+
+        vector<string> inputs(fieldLabels.size(), "");
+        int currentField = 0;
+        bool finished = false;
+
+        while (!finished)
+        {
+            int targetRow = fieldRows[currentField];
+            int targetCol = fieldCols[currentField] + inputs[currentField].length();
+
+            moveCursor(targetRow, targetCol);
+
+            int ch = _getch();
+
+            if (ch == 224 || ch == 0) // arrow keys
+            {
+                handleArrowKeys(ch, currentField, fieldLabels.size());
+            }
+            else if (ch == ESC_KEY)
+            {
+                return {}; // cancel
+            }
+            else if (ch == BACKSPACE_KEY)
+            {
+                handleBackspace(inputs[currentField]);
+            }
+            else if (ch == ENTER_KEY)
+            {
+                if (currentField < fieldLabels.size() - 1)
+                    currentField++;
+                else
+                    finished = true;
+            }
+            else
+            {
+                handleCharacter(ch, inputs[currentField], targetCol, 45);
+            }
+        }
+
+        moveCursor(footerRow + 2, 1);
+        return inputs;
+    }
 };
 
-#endif // CONSOLE_UI_H
+#endif
