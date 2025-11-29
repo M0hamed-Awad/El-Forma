@@ -1,4 +1,4 @@
-# El-Forma Gym Management System - Architecture Documentation
+![refactor](https://github.com/user-attachments/assets/82190af3-3c0c-4dae-b407-6e4442ea07ab)# El-Forma Gym Management System - Architecture Documentation
 
 ## Project Overview
 
@@ -14,6 +14,17 @@ El-Forma is a gym management system built in C++ that manages members, trainers,
 
 ### Refactor Usecase
 ![refactor](https://github.com/user-attachments/assets/06415e72-3e2a-4480-a1b3-a49b17b2069e)
+
+## Activity Diagrams
+
+### Add Member
+![Add Member](add_member.png)
+
+### Update Member
+![Update Member](update_member.png)
+
+### Assign Member to Trainer
+![Assign Member to Trainer](assign_member_to_trainer.png)
 
 ---
 
