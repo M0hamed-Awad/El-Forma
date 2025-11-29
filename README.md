@@ -1,4 +1,4 @@
-![refactor](https://github.com/user-attachments/assets/82190af3-3c0c-4dae-b407-6e4442ea07ab)# El-Forma Gym Management System - Architecture Documentation
+# El-Forma Gym Management System - Architecture Documentation
 
 ## Project Overview
 
