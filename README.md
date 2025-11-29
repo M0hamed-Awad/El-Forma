@@ -18,13 +18,14 @@ El-Forma is a gym management system built in C++ that manages members, trainers,
 ## Activity Diagrams
 
 ### Add Member
-![Add Member](add_member.png)
+<img width="331" height="989" alt="Add Member Flow Chart drawio " src="https://github.com/user-attachments/assets/48769c20-46b6-4d0c-8f83-fe3cb67a84a9" />
 
 ### Update Member
-![Update Member](update_member.png)
+<img width="269" height="1392" alt="Update Member drawio (1)" src="https://github.com/user-attachments/assets/ab9e5790-7282-4b36-874a-923dc4a808b7" />
+
 
 ### Assign Member to Trainer
-![Assign Member to Trainer](assign_member_to_trainer.png)
+<img width="266" height="1079" alt="Assign New Member drawio (2)" src="https://github.com/user-attachments/assets/39b9eae7-1c58-43a2-baf8-905a00e575b7" />
 
 ---
 
