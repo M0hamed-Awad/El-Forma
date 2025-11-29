@@ -107,6 +107,15 @@ public:
         }
     }
 
+    // --- CASE HELPERS ---
+    static string toLower(string str) {
+        string result = "";
+        for (char c : str) {
+            result += tolower(c);
+        }
+        return result;
+    }
+
     // --- OUTPUT HELPERS ---
     // Print header with title
     static void printHeader(string title)
