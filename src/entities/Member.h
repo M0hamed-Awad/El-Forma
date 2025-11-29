@@ -8,7 +8,7 @@
 class Member : public User
 {
     string joinDate;
-    int subscriptionId;
+    int subscriptionId; // 1 = Standard, 2 = Premium
     
     inline static int nextMemberId = 0;
     inline static bool loadingFromDB = false;
