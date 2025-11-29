@@ -40,7 +40,7 @@ private:
         }
     }
 
-    // Add new member Helper - Normalize subscription type
+    // Add or Update Member Helper - Normalize subscription type
     string getNormalizedSubscriptionType(const string &type)
     {
         string lowerType = ConsoleUI::toLower(type);

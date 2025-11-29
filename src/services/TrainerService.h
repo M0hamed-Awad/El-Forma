@@ -30,6 +30,16 @@ private:
         }
     }
 
+    // Add or Update Trainer Helper - Normalize and Validate Specialty type
+    string getNormalizedSpecialty(const string& inputSpecialty) {
+        string lowerSpec = ConsoleUI::toLower(inputSpecialty);
+        if (lowerSpec == "cardio" || lowerSpec == "c" || lowerSpec == "1") return "Cardio";
+        if (lowerSpec == "strength" || lowerSpec == "s" || lowerSpec == "strength training" || lowerSpec == "2") return "Strength Training";
+        if (lowerSpec == "yoga" || lowerSpec == "y" || lowerSpec == "3") return "Yoga";
+        
+        return "Unknown";
+    }
+
 public:
     // Constructor
     TrainerService() {
@@ -43,8 +53,18 @@ public:
             {"Name", "Email", "Password", "Specialty"});
 
         if (data.empty()) return; // Cancelled
-                
-        Trainer* newTrainer = new Trainer(data[0], data[1], data[2], data[3]);
+
+        // Validation
+        string specInput = getNormalizedSpecialty(data[3]);
+        
+        if (specInput == "Unknown") {
+            ConsoleUI::printError("Invalid Specialty!");
+            ConsoleUI::printInfo("Allowed: Cardio, Strength, Yoga");
+            ConsoleUI::pause();
+            return; // Cancel the operation, Stop creation
+        }
+
+        Trainer* newTrainer = new Trainer(data[0], data[1], data[2], specInput);
         trainers.push_back(newTrainer);
         
         ConsoleUI::printSuccess("Trainer added successfully!");
@@ -128,7 +148,7 @@ public:
             return;
         }
         
-        //  Use the new Arrow Menu for choices
+        // Use Arrow Menu
         vector<string> opts = {
             "Update Specialty", 
             "Assign Member", 
@@ -137,19 +157,31 @@ public:
         
         int choice = ConsoleUI::getMenuSelection("UPDATE TRAINER: " + trainer->getName(), opts);
         
-        // Handle selection by Index
-        if (choice == 0) { // Update Specialty
-            string specialty = ConsoleUI::getInput("Enter new specialty: ");
-            trainer->setTrainerSpecialty(specialty);
-            ConsoleUI::printSuccess("Specialty updated!");
+        // ---  Update Specialty ---
+        if (choice == 0) { 
+            while(true) {
+                string input = ConsoleUI::getInput("Enter new specialty (Cardio/Strength/Yoga): ");
+                
+                // Validation
+                string validSpec = getNormalizedSpecialty(input);
+                
+                if (validSpec != "Unknown") {
+                    trainer->setTrainerSpecialty(validSpec);
+                    ConsoleUI::printSuccess("Specialty updated to " + validSpec + "!");
+                    break; // Success! Exit loop.
+                } else {
+                    ConsoleUI::printError("Invalid input. Please try again.");
+                }
+            }
         } 
-        else if (choice == 1) { // Assign Member
+        // ---  Assign Member ---
+        else if (choice == 1) { 
             if (availableMembers.empty()) {
                 ConsoleUI::printWarning("No members available to assign!");
                 return;
             }
             
-            // Display available members table
+            // Show Table
             ConsoleUI::printHeader("Available Members");
             vector<string> headers = {"ID", "Name", "Email"};
             vector<int> widths = {8, 20, 25};
@@ -164,7 +196,6 @@ public:
                 ConsoleUI::printTableRow(row, widths);
             }
             
-            // Select member
             int memberId = ConsoleUI::getIntInput("Enter member ID to assign: ");
             
             Member* memberToAssign = nullptr;
@@ -177,13 +208,12 @@ public:
             
             if (memberToAssign != nullptr) {
                 trainer->assignMember(memberToAssign);
-                // Note: Success message is handled inside trainer->assignMember
-                // But we can add a pause here if needed
             } else {
                 ConsoleUI::printError("Member not found!");
             }
         } 
-        else { // Cancel (Choice 2 or ESC)
+        // ---  Cancel ---
+        else { 
             ConsoleUI::printInfo("Update cancelled");
         }
     }
