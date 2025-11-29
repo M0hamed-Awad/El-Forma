@@ -6,6 +6,17 @@ El-Forma is a gym management system built in C++ that manages members, trainers,
 
 ---
 
+## Use Cases
+
+### Main Usecase
+![main](https://github.com/user-attachments/assets/66a12a09-b817-4d66-a8b9-14217cbb9394)
+
+
+### Refactor Usecase
+![refactor](https://github.com/user-attachments/assets/06415e72-3e2a-4480-a1b3-a49b17b2069e)
+
+---
+
 ## Project Structure
 
 ```
