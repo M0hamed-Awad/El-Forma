@@ -316,7 +316,7 @@ sequenceDiagram
     participant User
     participant System
     participant AdminService
-    participant Admin
+    participant AdminDatabase
     
     User->>System: Select "Login"
     System->>AdminService: login()
