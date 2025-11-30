@@ -379,7 +379,7 @@ public:
         }
     }
 
-    static void handleCharacter(int ch, string &fieldValue, int targetCol, int COL2_X, int currentField)
+    static void handleCharacter(int ch, string &fieldValue, int targetCol, int COL2_X, int currentField, bool isPassword = false)
     {
         if (ch >= 32 && ch <= 126) // Printable
         {
@@ -390,7 +390,11 @@ public:
             if ((targetCol < COL2_X - 2) || (currentField % 2 != 0))
             {
                 fieldValue += (char)ch;
-                cout << (char)ch;
+                if (isPassword) {
+                    cout << '*'; 
+                } else {
+                    cout << (char)ch; 
+                }
             }
         }
     }
@@ -464,8 +468,10 @@ public:
             }
             else
             {
+                string currentLabel = fieldLabels[currentField];
+                bool isPassword = currentLabel == "Password";
                 // FIX: Pass 'currentField' as the last argument
-                handleCharacter(ch, inputs[currentField], targetCol, 45, currentField);
+                handleCharacter(ch, inputs[currentField], targetCol, 45, currentField, isPassword);
             }
         }
 
