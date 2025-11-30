@@ -104,7 +104,6 @@ classDiagram
         -string name
         -string email
         -string password
-        +static int nextUserId
         +User(name, email, password)
         +getId() int
         +getName() string
