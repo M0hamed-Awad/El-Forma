@@ -25,10 +25,7 @@ private:
 
 public:
     // Constructor
-    System() : currentAdmin(nullptr)
-    {
-        // Database classes initialize themselves with test data
-    }
+    System() : currentAdmin(nullptr){}
 
     // Destructor
     ~System()
@@ -38,7 +35,6 @@ public:
             delete currentAdmin;
             currentAdmin = nullptr;
         }
-        // Note: Database classes manage their own memory
     }
 
     // ==================== AUTHENTICATION ====================

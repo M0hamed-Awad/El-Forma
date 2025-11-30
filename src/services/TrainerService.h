@@ -168,6 +168,7 @@ public:
                 if (validSpec != "Unknown") {
                     trainer->setTrainerSpecialty(validSpec);
                     ConsoleUI::printSuccess("Specialty updated to " + validSpec + "!");
+                    ConsoleUI::pause();
                     break; // Success! Exit loop.
                 } else {
                     ConsoleUI::printError("Invalid input. Please try again.");
@@ -208,8 +209,10 @@ public:
             
             if (memberToAssign != nullptr) {
                 trainer->assignMember(memberToAssign);
+                ConsoleUI::pause();
             } else {
                 ConsoleUI::printError("Member not found!");
+                ConsoleUI::pause();
             }
         } 
         // ---  Cancel ---
@@ -235,11 +238,13 @@ public:
                 delete *it;
                 trainers.erase(it);
                 ConsoleUI::printSuccess("Trainer '" + name + "' deleted successfully!");
+                ConsoleUI::pause();
                 return;
             }
         }
         
         ConsoleUI::printError("Trainer not found!");
+        ConsoleUI::pause();
     }
     
     // Find trainer by ID (internal use)

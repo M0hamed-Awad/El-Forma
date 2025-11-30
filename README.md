@@ -164,7 +164,7 @@ graph LR
 
 **Data:**
 - Static `vector<Admin*> admins` - In-memory admin storage
-- Default admin: mohamed@gmail.com / admin
+- Default admin: admin / 123
 
 ---
 

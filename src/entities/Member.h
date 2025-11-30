@@ -13,6 +13,10 @@ class Member : public User
     inline static int nextMemberId = 0;
     inline static bool loadingFromDB = false;
 
+    // TODO [V2.0]: Implement Loyalty Points System
+    // int accessPoints; 
+    // vector<Transaction> paymentHistory;
+
     string getCurrentDate()
     {
         time_t now = time(0);
