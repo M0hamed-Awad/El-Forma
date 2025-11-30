@@ -7,6 +7,7 @@
 
 #include "../entities/Member.h"
 #include "../services/ConsoleUI.h"
+#include "../services/TrainerService.h"
 
 using namespace std;
 
@@ -193,6 +194,7 @@ public:
         if (members.empty())
         {
             ConsoleUI::printWarning("No members to delete!");
+            ConsoleUI::pause();
             return;
         }
 
@@ -203,9 +205,15 @@ public:
             if ((*it)->getId() == id)
             {
                 string name = (*it)->getName();
+
+                // --- CASCADING DELETE ---
+                // Before deleting the member from memory, remove them from any Trainers.
+                TrainerService::removeMemberFromAllTrainers(id);
+
                 delete *it;
                 members.erase(it);
                 ConsoleUI::printSuccess("Member '" + name + "' deleted successfully!");
+                ConsoleUI::pause();
                 return;
             }
         }

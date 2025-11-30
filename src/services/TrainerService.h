@@ -261,6 +261,15 @@ public:
     bool isEmpty() {
         return trainers.empty();
     }
+
+    // Remove member from all trainers (called when a member is deleted)
+    static void removeMemberFromAllTrainers(int memberId)
+    {
+        for (Trainer *t : trainers)
+        {
+            t->removeMember(memberId);
+        }
+    }
 };
 
 // Initialize static members

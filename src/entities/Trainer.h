@@ -58,6 +58,22 @@ public:
             cout << ">> System: " << member->getName() << " assigned to " << this->name << endl;
         }
     }
+
+    // Remove a member from this trainer's list by ID
+    void removeMember(int memberId)
+    {
+        for (auto it = assignedMembers.begin(); it != assignedMembers.end(); ++it)
+        {
+            if ((*it)->getId() == memberId)
+            {
+                // We only erase the POINTER from this list.
+                // We do NOT 'delete *it' here, because MemberService is about to do that.
+                assignedMembers.erase(it); 
+                cout << ">> System: Member removed from Trainer " << this->name << "'s list." << endl;
+                return;
+            }
+        }
+    }
 };
 
 #endif
