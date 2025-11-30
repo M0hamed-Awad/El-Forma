@@ -124,7 +124,8 @@ public:
                 member->getName(),
                 member->getEmail(),
                 member->getJoinDate(),
-                to_string(member->getSubscriptionId())};
+                member->getSubscriptionType()
+            };
             ConsoleUI::printTableRow(row, widths);
         }
         ConsoleUI::pause();

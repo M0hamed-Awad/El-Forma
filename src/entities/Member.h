@@ -64,6 +64,7 @@ public:
 
     // Getters
     int getSubscriptionId() const {return subscriptionId;}
+    string getSubscriptionType() const {return subscriptionId == 1 ? "Standard" : "Premium";}
     string getJoinDate() const { return joinDate;}
     
     // Static ID management
