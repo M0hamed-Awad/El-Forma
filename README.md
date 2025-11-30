@@ -287,9 +287,9 @@ classDiagram
 
 ---
 
-## Data Flow
+## Sequence Diagram
 
-### Member Creation Flow
+### Member Creation
 
 ```mermaid
 sequenceDiagram
@@ -309,7 +309,7 @@ sequenceDiagram
     MemberService->>User: Display success message
 ```
 
-### Login Flow
+### Login
 
 ```mermaid
 sequenceDiagram
